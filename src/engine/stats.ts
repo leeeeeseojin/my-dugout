@@ -72,6 +72,8 @@ export function pitcherProfile(player: Player, batterHand: Hand): PitcherProfile
 }
 
 function computeHitter(player: Player, pitcherThrows: Hand): HitterProfile {
+  // 직접 매긴 능력치는 우연한 표본이 아니라 의도한 값이라 리그 평균 쪽으로 거의 당기지 않는다
+  const k = player.custom ? 0.08 : 1
   let pa = 0, h = 0, d = 0, t = 0, hr = 0, bb = 0, so = 0, sb = 0, cs = 0
   let spPa = 0, spH = 0, spHr = 0, spBb = 0, spSo = 0, rawSplitPa = 0
   const key = vsKey(pitcherThrows)
@@ -97,22 +99,22 @@ function computeHitter(player: Player, pitcherThrows: Hand): HitterProfile {
 
   const singles = Math.max(0, h - d - t - hr)
   const overall: Rates = {
-    so: regress(so, pa, LEAGUE.so, REGRESSION_PA.so),
-    bb: regress(bb, pa, LEAGUE.bb, REGRESSION_PA.bb),
-    hr: regress(hr, pa, LEAGUE.hr, REGRESSION_PA.hr),
-    single: regress(singles, pa, LEAGUE.single, REGRESSION_PA.single),
-    double: regress(d, pa, LEAGUE.double, REGRESSION_PA.double),
-    triple: regress(t, pa, LEAGUE.triple, REGRESSION_PA.triple),
+    so: regress(so, pa, LEAGUE.so, REGRESSION_PA.so * k),
+    bb: regress(bb, pa, LEAGUE.bb, REGRESSION_PA.bb * k),
+    hr: regress(hr, pa, LEAGUE.hr, REGRESSION_PA.hr * k),
+    single: regress(singles, pa, LEAGUE.single, REGRESSION_PA.single * k),
+    double: regress(d, pa, LEAGUE.double, REGRESSION_PA.double * k),
+    triple: regress(t, pa, LEAGUE.triple, REGRESSION_PA.triple * k),
   }
 
   // 좌우 기록은 전체 성향 쪽으로 한 번 더 당긴다
-  const splitHits = regress(spH - spHr, spPa, overall.single + overall.double + overall.triple, SPLIT_REGRESSION)
+  const splitHits = regress(spH - spHr, spPa, overall.single + overall.double + overall.triple, SPLIT_REGRESSION * k)
   const nonHrHits = overall.single + overall.double + overall.triple
   const scale = nonHrHits > 0 ? splitHits / nonHrHits : 1
   const rates: Rates = {
-    so: regress(spSo, spPa, overall.so, SPLIT_REGRESSION),
-    bb: regress(spBb, spPa, overall.bb, SPLIT_REGRESSION),
-    hr: regress(spHr, spPa, overall.hr, SPLIT_REGRESSION),
+    so: regress(spSo, spPa, overall.so, SPLIT_REGRESSION * k),
+    bb: regress(spBb, spPa, overall.bb, SPLIT_REGRESSION * k),
+    hr: regress(spHr, spPa, overall.hr, SPLIT_REGRESSION * k),
     single: overall.single * scale,
     double: overall.double * scale,
     triple: overall.triple * scale,
@@ -126,6 +128,8 @@ function computeHitter(player: Player, pitcherThrows: Hand): HitterProfile {
 }
 
 function computePitcher(player: Player, batterHand: Hand): PitcherProfile {
+  // 직접 매긴 능력치는 우연한 표본이 아니라 의도한 값이라 리그 평균 쪽으로 거의 당기지 않는다
+  const k = player.custom ? 0.08 : 1
   let bf = 0, h = 0, hr = 0, bb = 0, so = 0
   let spBf = 0, spH = 0, spHr = 0, spBb = 0, spSo = 0, rawSplit = 0
   const key = batterHand === 'S' ? (player.throws === 'L' ? 'vsR' : 'vsL') : batterHand === 'L' ? 'vsL' : 'vsR'
@@ -146,16 +150,16 @@ function computePitcher(player: Player, batterHand: Hand): PitcherProfile {
   }
   const lgHits = LEAGUE.single + LEAGUE.double + LEAGUE.triple
   const overall = {
-    so: regress(so, bf, LEAGUE.so, REGRESSION_PA.so),
-    bb: regress(bb, bf, LEAGUE.bb, REGRESSION_PA.bb),
-    hr: regress(hr, bf, LEAGUE.hr, REGRESSION_PA.hr),
-    hits: regress(h - hr, bf, lgHits, REGRESSION_PA.single),
+    so: regress(so, bf, LEAGUE.so, REGRESSION_PA.so * k),
+    bb: regress(bb, bf, LEAGUE.bb, REGRESSION_PA.bb * k),
+    hr: regress(hr, bf, LEAGUE.hr, REGRESSION_PA.hr * k),
+    hits: regress(h - hr, bf, lgHits, REGRESSION_PA.single * k),
   }
-  const hits = regress(spH - spHr, spBf, overall.hits, SPLIT_REGRESSION)
+  const hits = regress(spH - spHr, spBf, overall.hits, SPLIT_REGRESSION * k)
   const rates: Rates = {
-    so: regress(spSo, spBf, overall.so, SPLIT_REGRESSION),
-    bb: regress(spBb, spBf, overall.bb, SPLIT_REGRESSION),
-    hr: regress(spHr, spBf, overall.hr, SPLIT_REGRESSION),
+    so: regress(spSo, spBf, overall.so, SPLIT_REGRESSION * k),
+    bb: regress(spBb, spBf, overall.bb, SPLIT_REGRESSION * k),
+    hr: regress(spHr, spBf, overall.hr, SPLIT_REGRESSION * k),
     single: (hits * LEAGUE.single) / lgHits,
     double: (hits * LEAGUE.double) / lgHits,
     triple: (hits * LEAGUE.triple) / lgHits,
