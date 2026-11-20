@@ -205,3 +205,18 @@
   font-size: 13px;
   flex-shrink: 0;
 }
+
+/* AI 초안 경고 */
+.ai-warn h2 {
+  color: #b9661e;
+}
+
+.ai-warn p {
+  margin: 4px 0 4px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ai-tag {
+  color: #b9661e;
+}
