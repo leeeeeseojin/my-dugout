@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+import { fanRoster } from '../data/fanRosters'
 import { fromPlayer } from '../data/ratings'
 import { sampleRepository } from '../data/sampleRoster'
 import { checkRoster, createRepository, exportRosters, parseRosterFile, type CustomRoster } from './rosters'
@@ -20,16 +21,25 @@ describe('로스터 검사', () => {
 })
 
 describe('엔진 연결', () => {
-  test('직접 만든 로스터가 있는 구단만 그 선수를 쓰고, 나머지는 팬 로스터 초안을 쓴다', () => {
+  test('직접 만든 로스터가 있는 구단만 그 선수를 쓰고, 나머지는 가상 선수를 쓴다', () => {
     const repo = createRepository({ lg: sampleCustom('lg') })
-    expect(repo.getRoster('lg').every((p) => p.ratedBy === 'user')).toBe(true)
-    expect(repo.getRoster('ds').every((p) => p.ratedBy === 'ai')).toBe(true)
+    expect(repo.getRoster('lg').every((p) => p.custom && p.ratedBy === 'user')).toBe(true)
+    expect(repo.getRoster('ds').some((p) => p.custom)).toBe(false)
   })
 
-  test('경기에 못 쓰는 로스터는 팬 로스터 초안으로 대신한다', () => {
+  test('경기에 못 쓰는 로스터는 가상 선수로 대신한다', () => {
     const repo = createRepository({ lg: { teamId: 'lg', updatedAt: '', players: [] } })
     expect(repo.getRoster('lg').length).toBe(25)
-    expect(repo.getRoster('lg').every((p) => p.ratedBy === 'ai')).toBe(true)
+    expect(repo.getRoster('lg').some((p) => p.custom)).toBe(false)
+  })
+
+  test('AI 초안에서 불러와 아직 고치지 않은 선수만 AI 등급으로 표시한다', () => {
+    const players = fanRoster('kia')
+    players[0] = { ...players[0], ratedBy: undefined } // 사용자가 고쳐 저장한 선수
+    const repo = createRepository({ kia: { teamId: 'kia', updatedAt: '', players } })
+    const roster = repo.getRoster('kia')
+    expect(roster[0].ratedBy).toBe('user')
+    expect(roster.slice(1).every((p) => p.ratedBy === 'ai')).toBe(true)
   })
 })
 
