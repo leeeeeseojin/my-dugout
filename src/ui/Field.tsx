@@ -9,23 +9,23 @@ import './field.css'
 export const FIELD_W = 400
 export const FIELD_H = 640
 
-const HOME = { x: 200, y: 404 }
+const HOME = { x: 200, y: 420 }
 const BASES = [
-  { x: 262, y: 342 },
-  { x: 200, y: 280 },
-  { x: 138, y: 342 },
+  { x: 286, y: 340 },
+  { x: 200, y: 258 },
+  { x: 114, y: 340 },
 ]
 
 const SPOTS: Record<Exclude<Position, 'DH'>, { x: number; y: number }> = {
-  P: { x: 200, y: 348 },
-  C: { x: 200, y: 436 },
-  '1B': { x: 274, y: 318 },
-  '2B': { x: 240, y: 262 },
-  SS: { x: 160, y: 262 },
-  '3B': { x: 126, y: 318 },
-  LF: { x: 92, y: 178 },
-  CF: { x: 200, y: 128 },
-  RF: { x: 308, y: 178 },
+  P: { x: 200, y: 346 },
+  C: { x: 200, y: 452 },
+  '1B': { x: 312, y: 306 },
+  '2B': { x: 262, y: 236 },
+  SS: { x: 138, y: 236 },
+  '3B': { x: 88, y: 306 },
+  LF: { x: 78, y: 158 },
+  CF: { x: 200, y: 104 },
+  RF: { x: 322, y: 158 },
 }
 
 interface Props {
@@ -113,7 +113,7 @@ function Figure(props: {
   return (
     <g className="figure" style={{ transform: `translate(${x}px, ${y}px)` }} onClick={() => onSelect(id)}>
       <rect x={-18} y={-50} width={36} height={68} fill="transparent" />
-      <Character jersey={team.color} cap={team.accent === '#ffffff' ? team.color : team.accent} skin={player.look.skin} hair={player.look.hair} pose={pose} facing={facing} highlight={selected} />
+      <g transform="scale(0.88)"><Character jersey={team.color} cap={team.accent === '#ffffff' ? team.color : team.accent} skin={player.look.skin} hair={player.look.hair} pose={pose} facing={facing} highlight={selected} /></g>
       <Label x={0} y={0} text={player.name} accent={accent} />
     </g>
   )
@@ -144,7 +144,7 @@ export function Field({ game, players, teams, onSelect, selectedId }: Props) {
       <svg className="field-svg" viewBox={`0 0 ${FIELD_W} ${FIELD_H}`} preserveAspectRatio="xMidYMin slice">
         <defs>
           <clipPath id="outfield">
-            <path d="M 200 404 L 22 226 Q 200 -40 378 226 Z" />
+            <path d="M 200 420 L 6 226 Q 200 -70 394 226 Z" />
           </clipPath>
         </defs>
         <rect width={FIELD_W} height={FIELD_H} fill="#5cb85c" />
@@ -163,14 +163,14 @@ export function Field({ game, players, teams, onSelect, selectedId }: Props) {
             <rect key={i} x={i * 48 - 10} y={0} width={24} height={FIELD_H} fill="#62bb61" />
           ))}
         </g>
-        <path d="M 200 404 L 22 226 Q 200 -40 378 226 Z" fill="none" stroke="#3f8f45" strokeWidth={5} strokeLinejoin="round" />
+        <path d="M 200 420 L 6 226 Q 200 -70 394 226 Z" fill="none" stroke="#3f8f45" strokeWidth={5} strokeLinejoin="round" />
         {/* 파울 라인 */}
-        <path d="M 200 404 L 22 226 M 200 404 L 378 226" stroke="#fffaf0" strokeWidth={2} opacity={0.85} />
+        <path d="M 200 420 L 6 226 M 200 420 L 394 226" stroke="#fffaf0" strokeWidth={2} opacity={0.85} />
         {/* 내야 흙 */}
-        <path d="M 200 418 L 286 342 Q 200 210 114 342 Z" fill="#d9a066" />
-        <path d="M 200 386 L 246 342 L 200 298 L 154 342 Z" fill="#6cc46a" />
-        <circle cx={200} cy={348} r={12} fill="#d9a066" />
-        <circle cx={200} cy={348} r={4} fill="#c48a52" />
+        <path d="M 200 440 L 314 340 Q 200 168 86 340 Z" fill="#d9a066" />
+        <path d="M 200 402 L 266 340 L 200 278 L 134 340 Z" fill="#6cc46a" />
+        <circle cx={200} cy={346} r={13} fill="#d9a066" />
+        <circle cx={200} cy={346} r={4} fill="#c48a52" />
         <circle cx={HOME.x} cy={HOME.y + 2} r={20} fill="#d9a066" />
         {/* 베이스 */}
         <path d={`M ${HOME.x - 6} ${HOME.y - 4} h 12 v 5 l -6 5 l -6 -5 z`} fill="#fffaf0" />
@@ -187,7 +187,7 @@ export function Field({ game, players, teams, onSelect, selectedId }: Props) {
         {/* 주자와 타자: 같은 선수는 같은 key라 타석에서 베이스로 움직인다 */}
         {game.bases.map((r, i) =>
           r && r.id !== batterId ? (
-            <Figure key={r.id} id={r.id} x={BASES[i].x + (i === 1 ? 0 : i === 0 ? 10 : -10)} y={BASES[i].y + 6} player={players[r.id]} team={offTeam} pose="run" facing="up" onSelect={onSelect} selected={selectedId === r.id} />
+            <Figure key={r.id} id={r.id} x={BASES[i].x + (i === 1 ? 0 : i === 0 ? -6 : 6)} y={BASES[i].y + 10} player={players[r.id]} team={offTeam} pose="run" facing="up" onSelect={onSelect} selected={selectedId === r.id} />
           ) : null,
         )}
         <Figure key={batterId} id={batterId} x={HOME.x + (lefty ? 20 : -20)} y={HOME.y + 6} player={batter} team={offTeam} pose={lefty ? 'bat-l' : 'bat-r'} facing="up" onSelect={onSelect} selected={selectedId === batterId} accent />
