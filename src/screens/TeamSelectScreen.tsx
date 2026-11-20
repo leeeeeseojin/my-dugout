@@ -11,6 +11,13 @@ interface Props {
   onConfirm: (my: Team, opp: Team, myHome: boolean) => void
 }
 
+/** 받침이 있으면 "은", 없으면 "는" (LG·KIA처럼 영문 약칭은 모음으로 끝나 "는") */
+function withTopic(name: string) {
+  const code = name.charCodeAt(name.length - 1) - 0xac00
+  const batchim = code >= 0 && code <= 11171 && code % 28 !== 0
+  return name + (batchim ? '은' : '는')
+}
+
 function TeamFigure({ team, size = 52 }: { team: Team; size?: number }) {
   return (
     <svg viewBox="-20 -50 40 56" width={size} height={size * 1.4} aria-hidden>
@@ -54,6 +61,10 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
               <small>홈 · {home.city}</small>
             </div>
           </div>
+          <p className="vs-side title-text">{withTopic(match.my.short)} {match.myHome ? '홈에서 수비부터' : '원정에서 공격부터'} 시작해요</p>
+          <button className="game-btn secondary" style={{ width: 240 }} onClick={() => setMatch({ ...match, myHome: !match.myHome })}>
+            {match.myHome ? '원정으로 바꾸기' : '홈으로 바꾸기'}
+          </button>
           <button className="game-btn" onClick={() => onConfirm(match.my, match.opp, match.myHome)}>
             라인업 짜기
           </button>
