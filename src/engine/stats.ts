@@ -52,7 +52,26 @@ function vsKey(hand: Hand, batterHand?: Hand): 'vsL' | 'vsR' {
   return hand === 'L' ? 'vsL' : 'vsR'
 }
 
+const hitterCache = new WeakMap<Player, Map<Hand, HitterProfile>>()
+const pitcherCache = new WeakMap<Player, Map<Hand, PitcherProfile>>()
+
+function memo<T>(cache: WeakMap<Player, Map<Hand, T>>, player: Player, hand: Hand, make: () => T): T {
+  let byHand = cache.get(player)
+  if (!byHand) cache.set(player, (byHand = new Map()))
+  let value = byHand.get(hand)
+  if (!value) byHand.set(hand, (value = make()))
+  return value
+}
+
 export function hitterProfile(player: Player, pitcherThrows: Hand): HitterProfile {
+  return memo(hitterCache, player, pitcherThrows, () => computeHitter(player, pitcherThrows))
+}
+
+export function pitcherProfile(player: Player, batterHand: Hand): PitcherProfile {
+  return memo(pitcherCache, player, batterHand, () => computePitcher(player, batterHand))
+}
+
+function computeHitter(player: Player, pitcherThrows: Hand): HitterProfile {
   let pa = 0, h = 0, d = 0, t = 0, hr = 0, bb = 0, so = 0, sb = 0, cs = 0
   let spPa = 0, spH = 0, spHr = 0, spBb = 0, spSo = 0, rawSplitPa = 0
   const key = vsKey(pitcherThrows)
@@ -106,7 +125,7 @@ export function hitterProfile(player: Player, pitcherThrows: Hand): HitterProfil
   return { rates, samplePa: Math.round(pa), splitPa: rawSplitPa, speed, stealRate, stealAttempts: attempts }
 }
 
-export function pitcherProfile(player: Player, batterHand: Hand): PitcherProfile {
+function computePitcher(player: Player, batterHand: Hand): PitcherProfile {
   let bf = 0, h = 0, hr = 0, bb = 0, so = 0
   let spBf = 0, spH = 0, spHr = 0, spBb = 0, spSo = 0, rawSplit = 0
   const key = batterHand === 'S' ? (player.throws === 'L' ? 'vsR' : 'vsL') : batterHand === 'L' ? 'vsL' : 'vsR'
