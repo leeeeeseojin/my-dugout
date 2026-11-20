@@ -20,16 +20,16 @@ describe('로스터 검사', () => {
 })
 
 describe('엔진 연결', () => {
-  test('직접 만든 로스터가 있는 구단만 그 선수를 쓰고, 나머지는 가상 선수를 쓴다', () => {
+  test('직접 만든 로스터가 있는 구단만 그 선수를 쓰고, 나머지는 팬 로스터 초안을 쓴다', () => {
     const repo = createRepository({ lg: sampleCustom('lg') })
-    expect(repo.getRoster('lg').every((p) => p.custom)).toBe(true)
-    expect(repo.getRoster('ds').some((p) => p.custom)).toBe(false)
+    expect(repo.getRoster('lg').every((p) => p.ratedBy === 'user')).toBe(true)
+    expect(repo.getRoster('ds').every((p) => p.ratedBy === 'ai')).toBe(true)
   })
 
-  test('경기에 못 쓰는 로스터는 가상 선수로 대신한다', () => {
+  test('경기에 못 쓰는 로스터는 팬 로스터 초안으로 대신한다', () => {
     const repo = createRepository({ lg: { teamId: 'lg', updatedAt: '', players: [] } })
-    expect(repo.getRoster('lg').length).toBeGreaterThan(0)
-    expect(repo.getRoster('lg').some((p) => p.custom)).toBe(false)
+    expect(repo.getRoster('lg').length).toBe(25)
+    expect(repo.getRoster('lg').every((p) => p.ratedBy === 'ai')).toBe(true)
   })
 })
 
