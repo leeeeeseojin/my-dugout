@@ -63,7 +63,7 @@ export function LineupScreen({ team, roster, initial, onBack, onStart }: Props) 
   const hint = sel?.kind === 'order' ? '바꿀 타순이나 후보 선수를 누르세요' : sel?.kind === 'bench' ? '들어갈 타순을 누르세요' : '선수를 누르면 자리를 바꿀 수 있어요'
 
   return (
-    <div className="screen">
+    <div className="screen has-floating">
       <Scene />
       <div className="top-bar">
         <button className="round-btn" onClick={onBack} aria-label="뒤로">
@@ -142,7 +142,7 @@ export function LineupScreen({ team, roster, initial, onBack, onStart }: Props) 
         </p>
       </div>
 
-      <div className="sticky-start">
+      <div className="floating-start">
         <button className="game-btn" onClick={() => onStart(plan)}>
           플레이볼!
         </button>
