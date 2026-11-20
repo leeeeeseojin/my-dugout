@@ -324,11 +324,12 @@ export function withRo(name: string) {
 
 // ───────── 근거 문구 ─────────
 
-const CUSTOM_LIMIT = '직접 매긴 대략적 능력치라 실제 기록과 다를 수 있어요'
+const CUSTOM_LIMIT = '대략적 등급으로 만든 선수라 실제 기록과 다를 수 있어요'
 
 /** 근거의 출처: 능력치로 만든 선수는 표본 수 대신 "직접 매긴 능력치"라고 밝힌다 */
 function basis(p: Player, sample: string) {
-  return p.custom ? '직접 매긴 능력치' : sample
+  if (!p.custom) return sample
+  return p.ratedBy === 'ai' ? 'AI가 매긴 등급' : '직접 매긴 능력치'
 }
 
 function careerWord(p: Player) {

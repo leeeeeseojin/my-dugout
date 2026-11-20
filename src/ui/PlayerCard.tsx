@@ -41,7 +41,7 @@ export function PlayerCard({ player, team, game, onClose }: Props) {
             <h2>{player.name}</h2>
             <span className="pc-sub">
               {team.short} · {isPitcher ? ROLE_LABEL[player.role ?? 'RP'] + ' ' : ''}
-              {POS_LABEL[player.position]} · {HAND[player.throws]}투{HAND[player.bats]}타 · {player.custom ? '직접 만든 선수' : `${debut}년 데뷔`}
+              {POS_LABEL[player.position]} · {HAND[player.throws]}투{HAND[player.bats]}타 · {player.custom ? (player.ratedBy === 'ai' ? '팬 로스터 초안' : '직접 만든 선수') : `${debut}년 데뷔`}
             </span>
           </div>
           <button className="pc-close" onClick={onClose} aria-label="닫기">
@@ -79,7 +79,7 @@ function HitterBody({ player, todayLine }: { player: Player; todayLine?: GameSta
         <span>우투수 상대 <b>{fmtAvg(splitAvg(vsR))}</b> {!player.custom && <small>{vsR.pa}타석</small>}</span>
       </div>
       {player.custom ? (
-        <p className="pc-note">직접 매긴 대략적 능력치로 계산한 예상 성적이에요. 실제 기록이 아니에요.</p>
+        <p className="pc-note">{player.ratedBy === 'ai' ? 'AI가 평판으로 매긴 등급' : '직접 매긴 대략적 능력치'}로 계산한 예상 성적이에요. 실제 기록이 아니에요.</p>
       ) : (
         <table className="pc-table">
           <thead>
@@ -143,7 +143,7 @@ function PitcherBody({ player, todayLine }: { player: Player; todayLine?: GameSt
         <span>우타자 피안타율 <b>{fmtAvg(splitAvg(vsR))}</b> {!player.custom && <small>{vsR.pa}타자</small>}</span>
       </div>
       {player.custom ? (
-        <p className="pc-note">직접 매긴 대략적 능력치로 계산한 예상 성적이에요. 실제 기록이 아니에요.</p>
+        <p className="pc-note">{player.ratedBy === 'ai' ? 'AI가 평판으로 매긴 등급' : '직접 매긴 대략적 능력치'}로 계산한 예상 성적이에요. 실제 기록이 아니에요.</p>
       ) : (
         <table className="pc-table">
           <thead>
