@@ -36,8 +36,8 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
   }
 
   if (match) {
-    const away = match.myHome ? match.opp : match.my
     const home = match.myHome ? match.my : match.opp
+    const sideLabel = (isHome: boolean) => (isHome ? `홈 · ${home.city}` : '원정')
     return (
       <div className="screen centered">
         <Scene />
@@ -49,16 +49,19 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
             {match.opp.name}
           </h1>
           <div className="vs-row">
-            <div className="vs-team">
-              <TeamFigure team={away} size={64} />
-              {away.short}
-              <small>원정</small>
+            {/* 내 구단은 항상 왼쪽, 홈·원정은 아래 글자로 */}
+            <div className="vs-team mine">
+              <span className="mine-badge">내 구단</span>
+              <TeamFigure team={match.my} size={64} />
+              {match.my.short}
+              <small>{sideLabel(match.myHome)}</small>
             </div>
             <span className="vs title-text">VS</span>
             <div className="vs-team">
-              <TeamFigure team={home} size={64} />
-              {home.short}
-              <small>홈 · {home.city}</small>
+              <span className="mine-badge ghost">상대</span>
+              <TeamFigure team={match.opp} size={64} />
+              {match.opp.short}
+              <small>{sideLabel(!match.myHome)}</small>
             </div>
           </div>
           <p className="vs-side title-text">{withTopic(match.my.short)} {match.myHome ? '홈에서 수비부터' : '원정에서 공격부터'} 시작해요</p>
