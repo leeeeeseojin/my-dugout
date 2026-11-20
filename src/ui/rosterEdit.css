@@ -1,0 +1,207 @@
+/* 선수 편집 시트 */
+.player-card.edit-sheet {
+  padding: 16px 18px 18px;
+  max-height: 92%;
+}
+
+.edit-sheet .settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.edit-sheet .settings-head h2 {
+  font-size: 24px;
+}
+
+.edit-row {
+  padding: 8px 0;
+}
+
+.edit-row.two {
+  display: flex;
+  gap: 12px;
+}
+
+.edit-row.two > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.edit-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-row label.num {
+  flex: 0 0 72px;
+}
+
+.edit-row span,
+.edit-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.edit-row input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 2px solid var(--cream-dark);
+  background: #fffaf0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ink);
+  user-select: text;
+}
+
+.edit-row input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* 다섯 단계 고르기 */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.steps button {
+  flex: 1 0 auto;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--cream-dark);
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.steps button.on {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.edit-hint {
+  margin: 10px 0 2px;
+  padding-top: 10px;
+  border-top: 2px dashed var(--cream-dark);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.edit-preview {
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--forest);
+}
+
+.game-btn.danger {
+  background: var(--red);
+  color: #fffaf0;
+  box-shadow: 0 4px 0 #b4463b;
+}
+
+/* 로스터 목록 */
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  border-top: 2px dashed var(--cream-dark);
+  text-align: left;
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+
+.roster-row:first-of-type {
+  border-top: none;
+}
+
+.roster-row .rr-name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 17px;
+}
+
+.roster-row .rr-name small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.roster-row .rr-tag {
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.roster-row .rr-tag.mine {
+  color: var(--forest);
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+.roster-row .rr-tag.warn {
+  color: #b9661e;
+}
+
+.add-btn {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 6px;
+  border-radius: 14px;
+  border: 2px dashed var(--cream-dark);
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+
+.status-ok {
+  color: var(--forest);
+  font-family: var(--font-display);
+}
+
+.status-warn {
+  color: #b9661e;
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.notice {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255, 250, 240, 0.92);
+  margin: 0 0 12px;
+}
+
+.file-msg {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--forest);
+}
+
+.file-msg.error {
+  color: var(--red);
+}
+
+.roster-row .order {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  flex-shrink: 0;
+}
