@@ -180,14 +180,14 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
               </button>
             ) : (
               <div className="ai-warn" role="alert">
-                <h2>정말 불러올까요?</h2>
+                <h2>AI 초안을 불러올까요?</h2>
                 <p>{FAN_ROSTER_WARNING}</p>
                 <div className="btn-row">
                   <button className="game-btn secondary" onClick={() => setAiStep('idle')}>
                     그만두기
                   </button>
-                  <button className="game-btn danger" onClick={() => save(fanRoster(teamId))}>
-                    그래도 불러오기
+                  <button className="game-btn" onClick={() => save(fanRoster(teamId))}>
+                    불러오기
                   </button>
                 </div>
               </div>

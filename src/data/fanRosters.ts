@@ -7,8 +7,7 @@ import type { CustomPlayer, Level, Platoon } from './ratings'
 import { sampleRepository } from './sampleRoster'
 import type { Hand, PitcherRole, Position } from './types'
 
-export const FAN_ROSTER_WARNING =
-  'AI가 2025 시즌까지의 기억으로 매긴 추정이에요. 이름은 한두 글자 바꿨고, 능력치는 실제 기록이 아니라 틀린 곳이 많을 수 있어요. 2026 시즌 이적도 반영되지 않았어요. 불러온 뒤 아는 대로 고쳐 주세요.'
+export const FAN_ROSTER_WARNING = 'AI가 대략 짐작해서 채운 로스터라 실제와 다른 곳이 꽤 있어요. 2025 시즌 기준이라 최근 이적도 빠져 있어요. 불러온 뒤 아는 대로 고쳐 주세요.'
 
 // 타자: [이름, 포지션, 타격, 송구, 타율, 홈런, 볼넷, 삼진, 도루, 좌투수 상대]
 type H = [string, Position, Hand, Hand, Level, Level, Level, Level, Level, Platoon]
