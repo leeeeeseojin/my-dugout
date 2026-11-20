@@ -308,10 +308,18 @@ function stealCandidate(s: GameState) {
 }
 
 /** 비교 기준: 경기 후반 접전이면 "1점"의 가치가 더 크다 */
-function useProbMetric(s: GameState, side: 'offense' | 'defense') {
+function prefersProbMetric(s: GameState, side: 'offense' | 'defense') {
   const diff = scoreDiffFor(s, side === 'offense' ? offenseKey(s) : defenseKey(s))
   if (s.inning < 7) return false
   return side === 'offense' ? diff >= -1 && diff <= 0 : diff >= 0 && diff <= 1
+}
+
+/** 받침에 따라 "으로/로"를 붙인다 */
+export function withRo(name: string) {
+  const code = name.charCodeAt(name.length - 1) - 0xac00
+  if (code < 0 || code > 11171) return name + "로"
+  const jong = code % 28
+  return name + (jong === 0 || jong === 8 ? "로" : "으로")
 }
 
 // ───────── 공격 ─────────
@@ -361,6 +369,16 @@ export function offenseOptions(s: GameState, players: PlayerIndex, extraPinch?: 
   return opts
 }
 
+/** 아직 힘이 남은 선발을 내릴 때 불펜이 대신 던질 이닝만큼의 비용 (점) */
+export function bullpenBurden(s: GameState, players: PlayerIndex) {
+  const current = players[defense(s).pitcherId]
+  if (current.role !== 'SP') return 0
+  const pitches = s.pitching[current.id]?.pitches ?? 0
+  const inningsLeft = Math.max(0, (staminaOf(current) - pitches) / 16)
+  const gameLeft = Math.max(0, 9 - s.inning)
+  return Math.min(inningsLeft, gameLeft) * 0.14
+}
+
 export function defenseOptions(s: GameState, players: PlayerIndex, extraPitcher?: string): CoachOption[] {
   const opts: CoachOption[] = []
   const push = (id: string, kind: OptionKind, label: string, v: Variant, playerId?: string) =>
@@ -373,7 +391,14 @@ export function defenseOptions(s: GameState, players: PlayerIndex, extraPitcher?
   const best = relieverCandidates(s, players)[0]
   if (best) ids.add(best.player.id)
   if (extraPitcher) ids.add(extraPitcher)
-  for (const id of ids) push(`change:${id}`, 'change', `${players[id].name}로 교체`, { pitcherId: id }, id)
+  const burden = bullpenBurden(s, players)
+  for (const id of ids) {
+    push(`change:${id}`, 'change', `${withRo(players[id].name)} 교체`, { pitcherId: id }, id)
+    // 이번 이닝만 보면 교체가 늘 유리해 보이므로, 선발이 남겨둔 이닝을 불펜이 떠안는 비용을 더한다
+    const o = opts[opts.length - 1]
+    o.runs += burden
+    o.scoreProb = Math.min(1, o.scoreProb + burden * 0.5)
+  }
   return opts
 }
 
@@ -403,7 +428,7 @@ export function adviseFor(s: GameState, players: PlayerIndex, extra?: { pinch?: 
 /** 자동 진행용: 사용자 팀의 현재 장면에서 코치가 고를 작전 */
 export function adviseOffense(s: GameState, players: PlayerIndex, extraPinch?: string): CoachAdvice {
   const options = offenseOptions(s, players, extraPinch)
-  const metric = useProbMetric(s, 'offense') ? 'prob' : 'runs'
+  const metric = prefersProbMetric(s, 'offense') ? 'prob' : 'runs'
   const sorted = [...options].sort((a, b) => better(b, a, 'offense', metric))
   const best = sorted[0]
   const second = sorted[1]
@@ -467,7 +492,7 @@ export function adviseOffense(s: GameState, players: PlayerIndex, extraPinch?: s
 
 export function adviseDefense(s: GameState, players: PlayerIndex, extraPitcher?: string): CoachAdvice {
   const options = defenseOptions(s, players, extraPitcher)
-  const metric = useProbMetric(s, 'defense') ? 'prob' : 'runs'
+  const metric = prefersProbMetric(s, 'defense') ? 'prob' : 'runs'
   const sorted = [...options].sort((a, b) => better(b, a, 'defense', metric))
   const best = sorted[0]
   const second = sorted[1]
@@ -508,6 +533,12 @@ export function adviseDefense(s: GameState, players: PlayerIndex, extraPitcher?:
     limits.push('대신 내야를 빠져나가는 안타가 늘어날 수 있어요')
   }
   if (s.weather.kind === 'rain' || s.weather.kind === 'heavyRain') reasons.push('비 때문에 실책이 나오기 쉬운 상태예요')
+  const burden = bullpenBurden(s, players)
+  if (burden > 0.05) {
+    const line = `교체 쪽 예상에는 불펜이 떠안을 남은 이닝 부담 ${burden.toFixed(2)}점이 포함돼요`
+    if (best.kind === 'change') limits.unshift(line)
+    else reasons.push(line)
+  }
   limits.push('불펜 투수의 연투 피로는 반영하지 않아요')
 
   const smallSample = limits.some((l) => l.includes('표본'))
