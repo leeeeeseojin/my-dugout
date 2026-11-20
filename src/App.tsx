@@ -44,7 +44,7 @@ function App() {
     setScreen({ name: 'game', my, opp, myHome, game, seed: Date.now() })
   }
 
-  const finish = (s: Extract<Screen, { name: 'game' }>, game: GameState, decisions: DecisionRecord[]) => {
+  const saveRecord = (s: Extract<Screen, { name: 'game' }>, game: GameState, decisions: DecisionRecord[]) => {
     const me = game.userSide
     const other = me === 'home' ? 'away' : 'home'
     const w = winner(game)
@@ -64,6 +64,9 @@ function App() {
       delegated: decisions.length - manual.length,
       rained: game.log.some((l) => l.tone === 'weather' && (l.text.includes('비가 내리기') || l.text.includes('폭우'))),
     })
+  }
+
+  const showResult = (s: Extract<Screen, { name: 'game' }>, game: GameState, decisions: DecisionRecord[]) => {
     setScreen({ name: 'result', my: s.my, opp: s.opp, myHome: s.myHome, game, decisions })
   }
 
@@ -97,7 +100,8 @@ function App() {
             rng={rng}
             settings={settings}
             onSettings={setSettings}
-            onFinish={(game, decisions) => finish(screen, game, decisions)}
+            onGameOver={(game, decisions) => saveRecord(screen, game, decisions)}
+            onFinish={(game, decisions) => showResult(screen, game, decisions)}
           />
         )
       }

@@ -41,6 +41,8 @@ interface Props {
   rng: Rng
   settings: PlaySettings
   onSettings: (s: PlaySettings) => void
+  /** 경기가 끝난 순간 한 번 호출 (기록 저장) */
+  onGameOver: (game: GameState, decisions: DecisionRecord[]) => void
   onFinish: (game: GameState, decisions: DecisionRecord[]) => void
 }
 
@@ -60,7 +62,7 @@ interface Pending {
   scoreBefore: number
 }
 
-export function GameScreen({ initial, players, teams, rng, settings, onSettings, onFinish }: Props) {
+export function GameScreen({ initial, players, teams, rng, settings, onSettings, onGameOver, onFinish }: Props) {
   const [game, setGame] = useState(initial)
   const [phase, setPhase] = useState<Phase>('auto')
   const [paused, setPaused] = useState(false)
@@ -74,6 +76,7 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
   /** 이번 판단에서 "내가 고를게요"로 끼어들었는지. 끼어든 판단은 다시 코치에게 넘기지 않는다 */
   const [intervened, setIntervened] = useState(false)
   const pending = useRef<Pending[]>([])
+  const saved = useRef(false)
 
   const userTeam = teams[game.userSide]
 
@@ -101,6 +104,13 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
     },
     [settle],
   )
+
+  // 경기가 끝나는 순간 기록을 저장한다 (결과 화면으로 넘어가지 않아도 남도록)
+  useEffect(() => {
+    if (phase !== 'over' || saved.current) return
+    saved.current = true
+    onGameOver(game, decisions)
+  }, [phase, game, decisions, onGameOver])
 
   // ───────── 자동 진행 ─────────
   useEffect(() => {
