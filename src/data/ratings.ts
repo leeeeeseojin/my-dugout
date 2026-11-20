@@ -146,7 +146,7 @@ const SKINS = ['#f2c7a5', '#e8b48f', '#d9a07a', '#c68863', '#f5d2b8']
 const HAIRS = ['#2b2a26', '#3a2a1e', '#5a3b22', '#1e1e1e']
 
 /** 사용자가 만든 선수를 엔진이 쓰는 선수로 바꾼다 */
-export function toPlayer(teamId: string, c: CustomPlayer, index: number): Player {
+export function toPlayer(teamId: string, c: CustomPlayer, index: number, ratedBy: 'user' | 'ai' = 'user'): Player {
   const isPitcher = c.position === 'P'
   return {
     id: `${teamId}-c-${c.id}`,
@@ -162,6 +162,7 @@ export function toPlayer(teamId: string, c: CustomPlayer, index: number): Player
     pitching: isPitcher ? [pitcherSeason(c, c.pitcher ?? DEFAULT_PITCHER)] : [],
     look: { skin: SKINS[index % SKINS.length], hair: HAIRS[index % HAIRS.length] },
     custom: true,
+    ratedBy,
   }
 }
 

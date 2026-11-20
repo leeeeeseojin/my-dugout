@@ -87,6 +87,8 @@ export interface Player {
   look: { skin: string; hair: string }
   /** 사용자가 로스터 편집기에서 능력치로 만든 선수. 기록은 능력치로 계산한 예상치다 */
   custom?: boolean
+  /** 능력치를 누가 매겼는지: 사용자가 직접(user) 또는 팬 로스터 초안의 AI 등급(ai) */
+  ratedBy?: 'user' | 'ai'
 }
 
 /**
