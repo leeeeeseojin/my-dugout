@@ -36,6 +36,8 @@ export interface CustomPlayer {
   role?: PitcherRole
   hitter?: HitterRatings
   pitcher?: PitcherRatings
+  /** AI 초안에서 불러와 아직 사용자가 고치지 않았으면 'ai' */
+  ratedBy?: 'ai'
 }
 
 /** 화면에 보여줄 구간 이름과 엔진에 넣을 값 */

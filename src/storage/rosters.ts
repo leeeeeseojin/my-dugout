@@ -1,7 +1,7 @@
 // 직접 만든 로스터: 이 기기에만 저장하고, 파일로 내보내고 불러올 수 있다
 
 import { toPlayer, type CustomPlayer, type Level, type Platoon } from '../data/ratings'
-import { FAN_ROSTER_LABEL, fanRoster } from '../data/fanRosters'
+import { sampleRepository } from '../data/sampleRoster'
 import type { Hand, PitcherRole, Player, PlayerRepository, Position } from '../data/types'
 
 export interface CustomRoster {
@@ -63,28 +63,21 @@ const converted = new WeakMap<CustomRoster, Player[]>()
 function rosterPlayers(r: CustomRoster): Player[] {
   let list = converted.get(r)
   if (!list) {
-    list = r.players.map((p, i) => toPlayer(r.teamId, p, i))
+    // AI 초안에서 불러온 뒤 아직 고치지 않은 선수는 AI 등급으로 표시한다
+    list = r.players.map((p, i) => toPlayer(r.teamId, p, i, p.ratedBy ?? 'user'))
     converted.set(r, list)
   }
   return list
 }
 
-const fanCache = new Map<string, Player[]>()
-
-/** 팬 로스터 초안(이름 변형, AI 등급)을 엔진 선수로 */
-export function fanPlayers(teamId: string): Player[] {
-  if (!fanCache.has(teamId)) fanCache.set(teamId, fanRoster(teamId).map((p, i) => toPlayer(teamId, p, i, 'ai')))
-  return fanCache.get(teamId)!
-}
-
-/** 경기에 쓸 수 있는 직접 만든 로스터가 있으면 그것을, 없으면 팬 로스터 초안을 쓴다 */
+/** 경기에 쓸 수 있는 직접 만든 로스터가 있으면 그것을, 없으면 가상의 선수를 쓴다 */
 export function createRepository(map: RosterMap): PlayerRepository {
   const usable = Object.values(map).filter((r) => checkRoster(r.players).ok)
   return {
-    sourceLabel: usable.length ? `직접 만든 로스터 ${usable.length}팀 · 나머지는 ${FAN_ROSTER_LABEL}` : FAN_ROSTER_LABEL,
+    sourceLabel: usable.length ? `직접 만든 로스터 ${usable.length}팀 · 나머지는 가상의 선수` : '가상의 선수와 기록',
     getRoster(teamId) {
       const r = map[teamId]
-      return r && checkRoster(r.players).ok ? rosterPlayers(r) : fanPlayers(teamId)
+      return r && checkRoster(r.players).ok ? rosterPlayers(r) : sampleRepository.getRoster(teamId)
     },
   }
 }
@@ -136,6 +129,7 @@ export function parseRosterFile(text: string, knownTeams: string[]): CustomRoste
         role: position === 'P' ? pickOf(ROLES, p.role, 'RP') : undefined,
         hitter: position !== 'P' ? { avg: level(h.avg), hr: level(h.hr), walk: level(h.walk), strikeout: level(h.strikeout), speed: level(h.speed), vsLefty: platoon(h.vsLefty) } : undefined,
         pitcher: position === 'P' ? { era: level(pi.era), strikeout: level(pi.strikeout), walk: level(pi.walk), vsLefty: platoon(pi.vsLefty) } : undefined,
+        ratedBy: p.ratedBy === 'ai' ? 'ai' : undefined,
       }
     })
     out.push({ teamId, updatedAt: new Date().toISOString(), players })

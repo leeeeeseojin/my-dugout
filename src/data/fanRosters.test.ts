@@ -3,11 +3,14 @@ import { createGame, type PlayerIndex } from '../engine/game'
 import { defaultLineup, toTeamSide } from '../engine/lineup'
 import { autoStep } from '../engine/manager'
 import { createRng } from '../engine/rng'
-import { checkRoster, fanPlayers } from '../storage/rosters'
+import { checkRoster } from '../storage/rosters'
 import { fanRoster } from './fanRosters'
+import { toPlayer } from './ratings'
 import { TEAMS } from './teams'
 
-describe('팬 로스터 초안', () => {
+const fanPlayers = (teamId: string) => fanRoster(teamId).map((p, i) => toPlayer(teamId, p, i, 'ai'))
+
+describe('AI 초안', () => {
   test('모든 구단이 타자 13명, 투수 12명이고 바로 경기에 쓸 수 있다', () => {
     for (const t of TEAMS) {
       const roster = fanRoster(t.id)
@@ -25,7 +28,11 @@ describe('팬 로스터 초안', () => {
     }
   })
 
-  test('팬 로스터끼리 경기해도 팀당 평균 득점이 현실적이다', { timeout: 30000 }, () => {
+  test('불러온 선수는 모두 AI 등급으로 표시된다', () => {
+    expect(fanRoster('lg').every((p) => p.ratedBy === 'ai')).toBe(true)
+  })
+
+  test('AI 초안끼리 경기해도 팀당 평균 득점이 현실적이다', { timeout: 30000 }, () => {
     let runs = 0
     const games = 120
     for (let g = 0; g < games; g++) {
@@ -40,7 +47,7 @@ describe('팬 로스터 초안', () => {
       runs += s.score.home + s.score.away
     }
     const perTeam = runs / games / 2
-    console.log('팬 로스터 팀당 평균 득점', perTeam.toFixed(2))
+    console.log('AI 초안 팀당 평균 득점', perTeam.toFixed(2))
     expect(perTeam).toBeGreaterThan(3)
     expect(perTeam).toBeLessThan(6.5)
   })

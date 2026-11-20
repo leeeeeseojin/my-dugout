@@ -166,7 +166,7 @@ export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onCl
               {confirmDelete ? '한 번 더 누르면 삭제' : '삭제'}
             </button>
           )}
-          <button className="game-btn" onClick={() => onSave({ ...p, name: p.name.trim() })}>
+          <button className="game-btn" onClick={() => onSave({ ...p, name: p.name.trim(), ratedBy: undefined })}>
             저장
           </button>
         </div>
