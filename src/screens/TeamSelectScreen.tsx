@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { TEAMS } from '../data/teams'
 import type { Team } from '../data/types'
 import { Character } from '../ui/Character'
+import { BackIcon } from '../ui/icons'
 import { Scene } from '../ui/Scene'
 import './screens.css'
 
@@ -31,9 +32,9 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
     const away = match.myHome ? match.opp : match.my
     const home = match.myHome ? match.my : match.opp
     return (
-      <div className="screen">
+      <div className="screen centered">
         <Scene />
-        <div className="versus">
+        <div className="versus center-block">
           <p className="title-text" style={{ fontSize: 22, margin: 0 }}>
             오늘의 상대는
           </p>
@@ -65,29 +66,31 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
   }
 
   return (
-    <div className="screen">
+    <div className="screen centered">
       <Scene />
-      <div className="top-bar">
-        <button className="round-btn" onClick={onBack} aria-label="뒤로">
-          ‹
-        </button>
-        <h1 className="title-text">내 구단 고르기</h1>
-      </div>
-      <div className="team-grid">
-        {TEAMS.map((t) => (
-          <button key={t.id} className="team-btn" onClick={() => choose(t)}>
-            <TeamFigure team={t} />
-            <div>
-              <b>{t.short}</b>
-              <span>{t.name}</span>
-            </div>
+      <div className="center-block">
+        <div className="top-bar">
+          <button className="round-btn" onClick={onBack} aria-label="뒤로">
+            <BackIcon />
           </button>
-        ))}
-      </div>
-      <div className="random-row">
-        <button className="game-btn" onClick={() => choose(TEAMS[Math.floor(Math.random() * TEAMS.length)])}>
-          아무 구단이나
-        </button>
+          <h1 className="title-text">내 구단 고르기</h1>
+        </div>
+        <div className="team-grid">
+          {TEAMS.map((t) => (
+            <button key={t.id} className="team-btn" onClick={() => choose(t)}>
+              <TeamFigure team={t} />
+              <div>
+                <b>{t.short}</b>
+                <span>{t.name}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+        <div className="random-row">
+          <button className="game-btn" onClick={() => choose(TEAMS[Math.floor(Math.random() * TEAMS.length)])}>
+            아무 구단이나
+          </button>
+        </div>
       </div>
     </div>
   )
