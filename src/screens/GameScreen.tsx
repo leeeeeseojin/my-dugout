@@ -26,7 +26,7 @@ import type { DecisionRecord } from '../engine/review'
 import type { Rng } from '../engine/rng'
 import { battingTotals, fmtAvg, pitcherProfile } from '../engine/stats'
 import { WEATHER_EFFECTS } from '../engine/weather'
-import { saveSettings, type PlaySettings } from '../storage/settings'
+import type { PlaySettings } from '../storage/settings'
 import { DecisionPanel, type Candidate } from '../ui/DecisionPanel'
 import { Field } from '../ui/Field'
 import { GearIcon, PlayIcon, WeatherIcon } from '../ui/icons'
@@ -230,11 +230,6 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
     })
   }, [advice, game, players])
 
-  const changeSettings = (s: PlaySettings) => {
-    saveSettings(s)
-    onSettings(s)
-  }
-
   // ───────── 화면 ─────────
   const cardPlayer = cardId ? players[cardId] : null
   const cardTeam = cardPlayer ? (cardPlayer.teamId === teams.home.id ? teams.home : teams.away) : null
@@ -354,7 +349,7 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
       </section>
 
       {cardPlayer && cardTeam && <PlayerCard player={cardPlayer} team={cardTeam} game={game} onClose={() => setCardId(null)} />}
-      {showSettings && <SettingsSheet settings={settings} onChange={changeSettings} onClose={() => setShowSettings(false)} />}
+      {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
       <span className="sr-only">{userTeam.name}</span>
     </div>
   )

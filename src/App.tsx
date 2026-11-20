@@ -12,7 +12,7 @@ import { RecordsScreen } from './screens/RecordsScreen'
 import { ResultScreen } from './screens/ResultScreen'
 import { TeamSelectScreen } from './screens/TeamSelectScreen'
 import { addRecord } from './storage/records'
-import { loadSettings, type PlaySettings } from './storage/settings'
+import { loadSettings, saveSettings, type PlaySettings } from './storage/settings'
 
 const repo = sampleRepository
 
@@ -27,6 +27,10 @@ type Screen =
 function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'home' })
   const [settings, setSettings] = useState<PlaySettings>(loadSettings)
+  const updateSettings = (s: PlaySettings) => {
+    saveSettings(s)
+    setSettings(s)
+  }
   const [rngSeed] = useState(() => Date.now() % 2147483647)
   const rng = useMemo(() => createRng(rngSeed), [rngSeed])
 
@@ -75,7 +79,7 @@ function App() {
   function render() {
     switch (screen.name) {
       case 'home':
-        return <HomeScreen sourceLabel={repo.sourceLabel} onStart={() => setScreen({ name: 'team' })} onRecords={() => setScreen({ name: 'records' })} />
+        return <HomeScreen sourceLabel={repo.sourceLabel} settings={settings} onSettings={updateSettings} onStart={() => setScreen({ name: 'team' })} onRecords={() => setScreen({ name: 'records' })} />
       case 'team':
         return <TeamSelectScreen onBack={() => setScreen({ name: 'home' })} onConfirm={goLineup} />
       case 'lineup':
@@ -84,6 +88,8 @@ function App() {
             team={screen.my}
             roster={repo.getRoster(screen.my.id)}
             initial={screen.plan}
+            settings={settings}
+            onSettings={updateSettings}
             onBack={() => setScreen({ name: 'team' })}
             onStart={(plan) => startGame(screen.my, screen.opp, screen.myHome, plan)}
           />
@@ -99,7 +105,7 @@ function App() {
             teams={teams}
             rng={rng}
             settings={settings}
-            onSettings={setSettings}
+            onSettings={updateSettings}
             onGameOver={(game, decisions) => saveRecord(screen, game, decisions)}
             onFinish={(game, decisions) => showResult(screen, game, decisions)}
           />
