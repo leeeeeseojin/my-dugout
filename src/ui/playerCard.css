@@ -1,6 +1,8 @@
 .sheet-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  max-width: 480px;
+  margin: 0 auto;
   z-index: 30;
   background: rgba(20, 30, 20, 0.45);
   display: flex;
