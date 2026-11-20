@@ -85,6 +85,8 @@ export interface Player {
   pitching: PitchingSeason[]
   /** 캐릭터 피부색 등 외형 표현용 */
   look: { skin: string; hair: string }
+  /** 사용자가 로스터 편집기에서 능력치로 만든 선수. 기록은 능력치로 계산한 예상치다 */
+  custom?: boolean
 }
 
 /**
