@@ -48,6 +48,14 @@ export function PlayIcon({ playing }: { playing: boolean }) {
   )
 }
 
+export function BackIcon() {
+  return (
+    <svg width={22} height={22} viewBox="0 0 22 22" aria-hidden>
+      <path d="M14 4 L7 11 L14 18" fill="none" stroke="currentColor" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function GearIcon() {
   return (
     <svg width={20} height={20} viewBox="0 0 20 20" aria-hidden>

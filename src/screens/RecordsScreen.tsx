@@ -3,6 +3,7 @@
 import { getTeam } from '../data/teams'
 import { loadRecords, summarize } from '../storage/records'
 import { Character } from '../ui/Character'
+import { BackIcon } from '../ui/icons'
 import { Scene } from '../ui/Scene'
 import './screens.css'
 
@@ -15,7 +16,7 @@ export function RecordsScreen({ onBack }: { onBack: () => void }) {
       <Scene />
       <div className="top-bar">
         <button className="round-btn" onClick={onBack} aria-label="뒤로">
-          ‹
+          <BackIcon />
         </button>
         <h1 className="title-text">지금까지 기록</h1>
       </div>

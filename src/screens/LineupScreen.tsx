@@ -5,6 +5,7 @@ import type { Player, Team } from '../data/types'
 import type { LineupPlan } from '../engine/lineup'
 import { battingTotals, fmtAvg, pitchingTotals } from '../engine/stats'
 import { PlayerCard } from '../ui/PlayerCard'
+import { BackIcon } from '../ui/icons'
 import { Scene } from '../ui/Scene'
 import './screens.css'
 
@@ -66,7 +67,7 @@ export function LineupScreen({ team, roster, initial, onBack, onStart }: Props) 
       <Scene />
       <div className="top-bar">
         <button className="round-btn" onClick={onBack} aria-label="뒤로">
-          ‹
+          <BackIcon />
         </button>
         <h1 className="title-text">{team.short} 라인업</h1>
       </div>
