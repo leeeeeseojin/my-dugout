@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { sampleRepository } from '../data/sampleRoster'
 import { createGame, playPlateAppearance, type GameState, type PlayerIndex } from './game'
-import { adviseDefense, adviseOffense } from './coach'
+import { adviseDefense, adviseOffense, bullpenBurden } from './coach'
 import { defaultLineup, toTeamSide } from './lineup'
 import { createRng } from './rng'
 
@@ -53,5 +53,15 @@ describe('AI 코치', () => {
     const keep = advice.options.find((o) => o.kind === 'pitch')!
     const change = advice.options.find((o) => o.kind === 'change')!
     expect(change.runs).toBeLessThan(keep.runs)
+  })
+
+  test('힘이 남은 선발을 1회에 내리면 불펜 부담이 예상 실점에 더해진다', () => {
+    const { s, players } = scene((g) => {
+      g.userSide = 'home'
+      g.outs = 1
+      g.bases = [{ id: g.away.lineup[0], pitcherId: g.home.pitcherId }, { id: g.away.lineup[1], pitcherId: g.home.pitcherId }, null]
+    })
+    expect(bullpenBurden(s, players)).toBeGreaterThan(0.8)
+    expect(adviseDefense(s, players).recommendedId).not.toMatch(/^change/)
   })
 })
