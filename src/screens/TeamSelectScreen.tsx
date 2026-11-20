@@ -66,15 +66,15 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
   }
 
   return (
-    <div className="screen centered">
+    <div className="screen split">
       <Scene />
-      <div className="center-block">
-        <div className="top-bar">
-          <button className="round-btn" onClick={onBack} aria-label="뒤로">
-            <BackIcon />
-          </button>
-          <h1 className="title-text">내 구단 고르기</h1>
-        </div>
+      <div className="top-bar">
+        <button className="round-btn" onClick={onBack} aria-label="뒤로">
+          <BackIcon />
+        </button>
+        <h1 className="title-text">내 구단 고르기</h1>
+      </div>
+      <div className="split-body">
         <div className="team-grid">
           {TEAMS.map((t) => (
             <button key={t.id} className="team-btn" onClick={() => choose(t)}>
@@ -86,11 +86,11 @@ export function TeamSelectScreen({ onBack, onConfirm }: Props) {
             </button>
           ))}
         </div>
-        <div className="random-row">
-          <button className="game-btn" onClick={() => choose(TEAMS[Math.floor(Math.random() * TEAMS.length)])}>
-            아무 구단이나
-          </button>
-        </div>
+      </div>
+      <div className="split-foot">
+        <button className="game-btn" onClick={() => choose(TEAMS[Math.floor(Math.random() * TEAMS.length)])}>
+          아무 구단이나
+        </button>
       </div>
     </div>
   )

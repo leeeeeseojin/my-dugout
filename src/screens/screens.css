@@ -58,6 +58,45 @@
   z-index: 2;
 }
 
+/* 위(제목)·가운데(내용)·아래(버튼)로 나눈 화면. 제목과 버튼은 고정, 가운데만 스크롤 */
+.screen.split {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen.split > .top-bar {
+  flex: none;
+  margin-bottom: 8px;
+}
+
+.split-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 2px;
+}
+
+/* 내용이 짧으면 가운데, 길면 위에서부터 스크롤 */
+.split-body > * {
+  margin-block: auto;
+}
+
+.split-foot {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+}
+
+.split-foot .game-btn {
+  width: 100%;
+  min-height: 56px;
+  font-size: 20px;
+}
+
 /* ───── 시작 ───── */
 .home {
   display: flex;
@@ -150,12 +189,6 @@
   font-family: var(--font-body);
   font-size: 12px;
   color: var(--ink-soft);
-}
-
-.random-row {
-  display: flex;
-  justify-content: center;
-  margin-top: 18px;
 }
 
 .versus {
