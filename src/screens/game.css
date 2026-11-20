@@ -1,0 +1,482 @@
+.game-screen {
+  position: absolute;
+  inset: 0;
+}
+
+/* ───── 위쪽 점수판 ───── */
+.hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: max(12px, env(safe-area-inset-top)) 12px 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.hud > * {
+  pointer-events: auto;
+}
+
+.scoreboard {
+  background: var(--panel);
+  color: var(--on-panel);
+  border-radius: 16px;
+  padding: 6px 12px;
+  min-width: 128px;
+}
+
+.sb-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+.sb-team.batting {
+  opacity: 1;
+}
+
+.sb-chip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.sb-name small {
+  font-size: 12px;
+  color: var(--gold);
+}
+
+.sb-score {
+  margin-left: auto;
+  font-size: 21px;
+}
+
+.inning-box {
+  background: var(--panel);
+  color: var(--on-panel);
+  border-radius: 16px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.inning {
+  font-family: var(--font-display);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+.arrow.top {
+  border-bottom: 9px solid var(--gold);
+}
+
+.arrow.bottom {
+  border-top: 9px solid var(--gold);
+}
+
+.outs {
+  display: flex;
+  gap: 5px;
+}
+
+.outs i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--on-panel-soft);
+}
+
+.outs i.on {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.hud-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.weather {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--panel);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ───── 아래쪽 패널 ───── */
+.bottom-panel {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 6;
+  background: var(--panel);
+  color: var(--on-panel);
+  border-radius: 20px;
+  padding: 14px 16px 16px;
+  max-height: 62%;
+  overflow-y: auto;
+}
+
+.log {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  color: var(--on-panel);
+}
+
+.log-line {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--on-panel-soft);
+  line-height: 1.45;
+}
+
+.log-line.latest {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--on-panel);
+}
+
+.log-line.tone-score {
+  color: #ffd27a;
+}
+
+.log-line.tone-weather {
+  color: #9fdcf2;
+}
+
+.log-line.tone-change {
+  color: #c7e6a8;
+}
+
+.log-inning {
+  display: inline-block;
+  min-width: 46px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.bottom-panel.open .log-line {
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.matchup {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--panel-line);
+  font-size: 13px;
+  color: var(--on-panel-soft);
+}
+
+.matchup b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--on-panel);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.owner-hint {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--on-panel-soft);
+  text-align: right;
+}
+
+.segment {
+  display: inline-flex;
+  background: var(--cream-dark);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.segment button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.segment button.on {
+  background: var(--cream);
+  color: var(--ink);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.segment.dark {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.segment.dark button {
+  color: var(--on-panel-soft);
+}
+
+.segment.dark button.on {
+  background: var(--on-panel);
+  color: var(--ink);
+}
+
+/* ───── 작전 패널 ───── */
+.decision {
+  animation: rise 220ms ease-out;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+.dp-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.coach-line {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-left: 3px solid var(--gold);
+  padding-left: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.coach-line b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.dp-soft {
+  font-size: 12px;
+  color: var(--on-panel-soft);
+}
+
+.dp-limit {
+  font-size: 12px;
+  color: #ffc3b8;
+}
+
+.why {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.why-btn {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dp-metric {
+  font-size: 11px;
+  color: var(--on-panel-soft);
+  margin-bottom: 2px;
+}
+
+.dp-opt {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 46px;
+  gap: 10px;
+  border-top: 1px solid var(--panel-line);
+  text-align: left;
+  color: var(--on-panel);
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.dp-opt .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--on-panel-soft);
+  flex-shrink: 0;
+}
+
+.dp-opt.on .dot {
+  border-color: var(--gold);
+  background: var(--gold);
+  box-shadow: inset 0 0 0 3px var(--panel);
+}
+
+.dp-opt.on .dp-label {
+  font-family: var(--font-display);
+  color: #ffe08a;
+  font-size: 16px;
+}
+
+.dot.hollow {
+  border-style: dashed;
+}
+
+.dp-label {
+  flex: 1;
+}
+
+.coach-tag {
+  margin-left: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--panel);
+  background: var(--gold);
+  border-radius: 999px;
+  padding: 1px 7px;
+  vertical-align: 2px;
+}
+
+.dp-value {
+  font-family: var(--font-display);
+  color: var(--on-panel-soft);
+}
+
+.cand-list {
+  padding: 4px 0 6px 24px;
+}
+
+.cand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 7px 0;
+  border-top: 1px dashed var(--panel-line);
+  color: var(--on-panel);
+  font-family: var(--font-display);
+  font-size: 15px;
+}
+
+.dp-wide {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.countdown {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  margin: 4px 0 4px;
+}
+
+.countdown span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  animation: shrink linear forwards;
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+
+.over {
+  text-align: center;
+}
+
+.over h2 {
+  font-size: 28px;
+}
+
+.over p {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--on-panel-soft);
+}
+
+/* ───── 설정 시트 ───── */
+.player-card.settings {
+  padding: 16px 18px 18px;
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.settings-head h2 {
+  font-size: 24px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 2px dashed var(--cream-dark);
+}
+
+.settings-row b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 17px;
+}
+
+.settings-row span {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.settings-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
