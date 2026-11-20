@@ -71,6 +71,8 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
   const [cardId, setCardId] = useState<string | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [logOpen, setLogOpen] = useState(false)
+  /** 이번 판단에서 "내가 고를게요"로 끼어들었는지. 끼어든 판단은 다시 코치에게 넘기지 않는다 */
+  const [intervened, setIntervened] = useState(false)
   const pending = useRef<Pending[]>([])
 
   const userTeam = teams[game.userSide]
@@ -95,6 +97,7 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
       setPhase(next.over ? 'over' : 'auto')
       setAdvice(null)
       setExtraId(undefined)
+      setIntervened(false)
     },
     [settle],
   )
@@ -128,12 +131,12 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
     return () => clearTimeout(t)
   }, [game, phase, paused, speed, cardId, showSettings, players, rng, settings, advance])
 
-  // 설정에서 맡기기로 바꾸면 지금 판단도 바로 맡긴다
+  // 설정에서 맡기기로 바꾸면 지금 판단도 바로 맡긴다. 단, 사용자가 직접 끼어든 판단은 그대로 둔다
   useEffect(() => {
-    if (phase !== 'decide' || !advice) return
+    if (phase !== 'decide' || !advice || intervened) return
     const owner = advice.side === 'offense' ? settings.offense : settings.defense
     if (owner === 'coach') setPhase('delegate')
-  }, [settings, phase, advice])
+  }, [settings, phase, advice, intervened])
 
   // ───────── 사용자 판단 적용 ─────────
   const decide = useCallback(
@@ -285,7 +288,10 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
             extraId={extraId}
             onPickCandidate={pickCandidate}
             onDecide={decide}
-            onIntervene={() => setPhase('decide')}
+            onIntervene={() => {
+              setIntervened(true)
+              setPhase('decide')
+            }}
           />
         ) : phase === 'over' ? (
           <div className="over">
