@@ -1,54 +1,73 @@
-# React + TypeScript + Vite
+# MY DUGOUT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**내가 감독이라면?** KBO 구단을 골라 한 경기를 처음부터 끝까지 직접 운영하는 모바일 야구 감독 게임.
 
-Currently, two official plugins are available:
+AI 코치가 옆에서 작전을 추천하지만, 결정은 언제나 감독(사용자)이 내립니다. 경기가 끝나면 내 판단, 코치의 추천, 비슷한 상황에서 실제 감독들이 한 선택을 나란히 비교합니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> 지금은 **샘플 데이터**로 동작합니다. 선수 이름과 기록, 실제 감독 사례는 모두 가상의 값이며 실제 선수·경기와 관계없습니다.
 
-## Expanding the ESLint configuration
+## 실행
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm test         # 엔진 테스트
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+모바일 화면 비율(최대 480px)로 맞춰져 있어 휴대폰 브라우저나 개발자 도구의 모바일 화면으로 보는 게 좋습니다.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 게임 흐름
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+1. 구단 선택 (직접 또는 랜덤) → 상대 구단 랜덤 배정, 홈·원정 랜덤
+2. 라인업: 타순 바꾸기, 후보와 교체, 선발 투수 선택
+3. 경기: 위에서 내려다본 야구장에 선수 캐릭터가 서 있고, 누르면 선수 카드가 열림
+4. 판단 순간: 강공·번트·도루·대타 / 정면 승부·투수 교체·고의사구·전진 수비
+5. 날씨 변수: 바람(장타 증가·감소), 갑작스러운 비(실책 증가, 도루·번트 불리), 폭우(중단, 5회 이후 강우 콜드)
+6. 결과와 복기: 이닝별 점수, 판단마다 나 · 코치 · 실제 감독 사례
+7. 지금까지 기록: 구단별 카드, 승패, 코치와 같은 선택 비율
+
+## HCI 설계 포인트
+
+게임이 본체이고, 아래 원칙은 게임 안에 녹여 넣었습니다.
+
+| 원칙 | 적용 |
+| --- | --- |
+| 사용자 통제권 | 진행 속도(1·2·4배), 일시정지, 언제 물어볼지(중요할 때·매 타석) |
+| 상황 기반 인터페이스 | 지금 고를 수 있는 작전만 노출 (주자 없으면 번트·도루 없음) |
+| 의사결정 지원 | 작전마다 예상 득점(실점) 또는 1점 확률 표시. AI 코치를 꺼도 유지 |
+| Human-in-the-Loop | 코치 추천은 미리 골라져 있을 뿐, 결정 버튼은 사용자가 누름. 다른 대타·투수로 바꾸면 예상 효과를 다시 계산 |
+| 설명 가능성 | 추천 근거(좌우 상대 기록, 투구 수 등)와 한계(표본 부족, 반영 안 된 요소), 확신 정도 표시 |
+| 조절 가능한 자율성 | 공격·투수 영역별로 "내가 / 코치에게" 위임, 경기 중 언제든 변경 |
+| 개입 가능성 | 코치에게 맡긴 판단도 실행 전 카운트다운 동안 "잠깐, 내가 고를게요"로 끼어들기 |
+| 신뢰 보정 | 경기 후 코치의 예상과 실제 결과를 구분해 보여주고, 실제 감독 행동은 의도가 아닌 사실만 표시 |
+
+## 구조
+
 ```
+src/
+  data/       선수·구단 타입, 샘플 명단 생성기, 샘플 감독 사례
+  engine/     경기 엔진(순수 함수), 기록→확률 계산, AI 코치, 자동 감독, 날씨, 복기 검색
+  storage/    운영 설정과 경기 기록 (localStorage)
+  ui/         캐릭터, 필드, 선수 카드, 작전 패널, 설정 시트
+  screens/    시작, 구단 선택, 라인업, 경기, 결과, 기록
+```
+
+### 시뮬레이션
+
+- 선수의 데뷔 시즌부터 현재까지 기록을 최근 시즌일수록 크게 가중해 합칩니다.
+- 표본이 적으면 리그 평균 쪽으로 당깁니다. 신인의 10타석 3홈런 같은 기록이 과하게 반영되지 않습니다.
+- 타자와 투수의 확률은 log5(오즈비)로 합치고, 좌우 상대 기록과 투수 피로, 날씨를 반영합니다.
+- AI 코치는 작전마다 남은 이닝을 500번 시뮬레이션해 비교합니다. 코치의 모델은 실제 경기 엔진보다 단순해서 예상이 틀릴 수 있습니다.
+
+## 실제 데이터로 바꾸기
+
+데이터는 `PlayerRepository` 인터페이스(`src/data/types.ts`) 하나로 연결됩니다.
+
+- **구단 명단**: 현재 시즌 기준으로 지금 소속된 선수만 `getRoster(teamId)`로 돌려줍니다.
+- **선수 기록**: 각 선수의 `batting` / `pitching` 배열에 데뷔 시즌부터 현재 시즌까지 시즌별 기록을 오래된 순으로 넣습니다. 좌우 상대 기록(`vsL`, `vsR`)도 시즌별로 넣습니다.
+- **실제 감독 사례**: 경기별 플레이 기록에서 판단 순간을 추출해 `RealCase` 형식(`src/engine/review.ts`)으로 넣습니다.
+
+`sampleRepository`와 `sampleCases()`를 실제 데이터 구현으로 바꾸면 나머지 코드는 그대로 동작합니다.
+
+실제 기록을 쓸 때는 데이터 출처의 이용 약관과 선수 초상·구단 로고·응원가 등의 권리를 따로 확인해야 합니다. 이 프로젝트는 로고와 선수 사진을 쓰지 않고 구단명과 대표 색만 사용합니다.
