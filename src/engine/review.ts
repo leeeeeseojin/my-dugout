@@ -2,6 +2,7 @@
 // 판단 순간마다 상황·코치 추천·사용자 선택을 남기고, 경기 후 비슷한 실제 사례를 찾는다.
 
 import type { OptionKind } from './coach'
+import type { StylePick } from './styles'
 
 export interface Situation {
   inning: number
@@ -24,6 +25,8 @@ export interface DecisionRecord {
   options: { id: string; kind: OptionKind; label: string; value: string }[]
   coachPickId: string
   coachConfidence: string
+  /** 같은 상황에서 세 AI 감독 스타일이 고른 작전 */
+  styles: StylePick[]
   userPickId: string
   /** 코치에게 맡겨서 자동으로 결정됐는지 */
   delegated: boolean

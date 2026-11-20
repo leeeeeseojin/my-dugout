@@ -23,6 +23,7 @@ import {
 } from '../engine/game'
 import { autoDefense, autoOffense, autoPitchingChange, scoreDiffFor } from '../engine/manager'
 import type { DecisionRecord } from '../engine/review'
+import { stylePicks } from '../engine/styles'
 import type { Rng } from '../engine/rng'
 import { battingTotals, fmtAvg, pitcherProfile } from '../engine/stats'
 import { WEATHER_EFFECTS } from '../engine/weather'
@@ -180,6 +181,7 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
         })),
         coachPickId: advice.recommendedId,
         coachConfidence: advice.confidence,
+        styles: stylePicks(advice, game, players),
         userPickId: opt.id,
         delegated,
         runsAfter: null,
