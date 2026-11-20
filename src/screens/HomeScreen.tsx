@@ -11,10 +11,11 @@ interface Props {
   settings: PlaySettings
   onSettings: (s: PlaySettings) => void
   onStart: () => void
+  onRosters: () => void
   onRecords: () => void
 }
 
-export function HomeScreen({ sourceLabel, settings, onSettings, onStart, onRecords }: Props) {
+export function HomeScreen({ sourceLabel, settings, onSettings, onStart, onRosters, onRecords }: Props) {
   const [showSettings, setShowSettings] = useState(false)
   return (
     <div className="screen home">
@@ -35,10 +36,17 @@ export function HomeScreen({ sourceLabel, settings, onSettings, onStart, onRecor
       <button className="game-btn" onClick={onStart}>
         경기 시작
       </button>
+      <button className="game-btn secondary" onClick={onRosters}>
+        로스터 편집
+      </button>
       <button className="game-btn secondary" onClick={onRecords}>
         지금까지 기록
       </button>
-      <p className="data-note">{sourceLabel}</p>
+      <p className="data-note">
+        {sourceLabel}
+        <br />
+        비공식 팬 게임 · KBO, 구단, 선수와 관계없어요
+      </p>
       {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
     </div>
   )

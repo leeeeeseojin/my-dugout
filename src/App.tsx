@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { sampleRepository } from './data/sampleRoster'
 import type { Team } from './data/types'
 import { createGame, winner, type GameState, type PlayerIndex } from './engine/game'
 import { defaultLineup, toTeamSide, type LineupPlan } from './engine/lineup'
@@ -9,12 +8,12 @@ import { GameScreen } from './screens/GameScreen'
 import { HomeScreen } from './screens/HomeScreen'
 import { LineupScreen } from './screens/LineupScreen'
 import { RecordsScreen } from './screens/RecordsScreen'
+import { RosterScreen } from './screens/RosterScreen'
 import { ResultScreen } from './screens/ResultScreen'
 import { TeamSelectScreen } from './screens/TeamSelectScreen'
 import { addRecord } from './storage/records'
+import { createRepository, loadRosters, saveRosters, type RosterMap } from './storage/rosters'
 import { loadSettings, saveSettings, type PlaySettings } from './storage/settings'
-
-const repo = sampleRepository
 
 type Screen =
   | { name: 'home' }
@@ -23,6 +22,7 @@ type Screen =
   | { name: 'game'; my: Team; opp: Team; myHome: boolean; game: GameState; seed: number }
   | { name: 'result'; my: Team; opp: Team; myHome: boolean; game: GameState; decisions: DecisionRecord[] }
   | { name: 'records' }
+  | { name: 'rosters' }
 
 function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'home' })
@@ -31,6 +31,13 @@ function App() {
     saveSettings(s)
     setSettings(s)
   }
+  const [rosters, setRosters] = useState<RosterMap>(loadRosters)
+  const updateRosters = (map: RosterMap) => {
+    saveRosters(map)
+    setRosters(map)
+  }
+  // 경기에 쓸 수 있는 직접 만든 로스터가 있으면 그 구단은 그 선수들로, 나머지는 가상 선수로
+  const repo = useMemo(() => createRepository(rosters), [rosters])
   const [rngSeed] = useState(() => Date.now() % 2147483647)
   const rng = useMemo(() => createRng(rngSeed), [rngSeed])
 
@@ -79,7 +86,7 @@ function App() {
   function render() {
     switch (screen.name) {
       case 'home':
-        return <HomeScreen sourceLabel={repo.sourceLabel} settings={settings} onSettings={updateSettings} onStart={() => setScreen({ name: 'team' })} onRecords={() => setScreen({ name: 'records' })} />
+        return <HomeScreen sourceLabel={repo.sourceLabel} settings={settings} onSettings={updateSettings} onStart={() => setScreen({ name: 'team' })} onRosters={() => setScreen({ name: 'rosters' })} onRecords={() => setScreen({ name: 'records' })} />
       case 'team':
         return <TeamSelectScreen onBack={() => setScreen({ name: 'home' })} onConfirm={goLineup} />
       case 'lineup':
@@ -126,6 +133,8 @@ function App() {
       }
       case 'records':
         return <RecordsScreen onBack={() => setScreen({ name: 'home' })} />
+      case 'rosters':
+        return <RosterScreen rosters={rosters} onChange={updateRosters} onBack={() => setScreen({ name: 'home' })} />
     }
   }
 }
