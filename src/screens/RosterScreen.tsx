@@ -1,8 +1,8 @@
 // 로스터 편집: 구단별로 선수 이름과 대략적 능력치를 직접 채운다
 
 import { useRef, useState } from 'react'
-import { DEFAULT_HITTER, DEFAULT_PITCHER, HITTER_SCALE, PITCHER_SCALE, fromPlayer, type CustomPlayer } from '../data/ratings'
-import { sampleRepository } from '../data/sampleRoster'
+import { fanRoster } from '../data/fanRosters'
+import { DEFAULT_HITTER, DEFAULT_PITCHER, HITTER_SCALE, PITCHER_SCALE, type CustomPlayer } from '../data/ratings'
 import { TEAMS, getTeam } from '../data/teams'
 import { checkRoster, exportRosters, parseRosterFile, type CustomRoster, type RosterMap } from '../storage/rosters'
 import { BackIcon } from '../ui/icons'
@@ -82,7 +82,7 @@ export function RosterScreen({ rosters, onChange, onBack }: Props) {
         <h1 className="title-text">로스터 편집</h1>
       </div>
       <p className="notice">
-        선수 이름과 능력치를 직접 채워요. 실제 기록을 보고 가장 가까운 구간을 고르면 돼요. 직접 만든 로스터는 이 기기에만 저장되고, 만들지 않은 구단은 가상의 선수로 경기해요.
+        선수 이름과 능력치를 직접 채워요. 실제 기록을 보고 가장 가까운 구간을 고르면 돼요. 직접 만든 로스터는 이 기기에만 저장되고, 만들지 않은 구단은 팬 로스터 초안(이름 변형, AI가 매긴 등급)으로 경기해요.
       </p>
 
       <div className="note">
@@ -95,7 +95,7 @@ export function RosterScreen({ rosters, onChange, onBack }: Props) {
               <span className="order" style={{ background: t.color }} />
               <span className="rr-name">
                 {t.name}
-                <small>{r ? `타자 ${check!.counts.hitters} · 투수 ${check!.counts.starters + check!.counts.bullpen}` : '가상의 선수'}</small>
+                <small>{r ? `타자 ${check!.counts.hitters} · 투수 ${check!.counts.starters + check!.counts.bullpen}` : '팬 로스터 초안'}</small>
               </span>
               <span className={`rr-tag${check?.ok ? ' mine' : check ? ' warn' : ''}`}>{check?.ok ? '내 로스터' : check ? '채우는 중' : '만들기 ›'}</span>
             </button>
@@ -160,10 +160,10 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
           </div>
           <div className="note">
             <h2>어떻게 시작할까요?</h2>
-            <p className="note-sub">가상 선수로 시작하면 25명이 이미 채워져 있어서, 이름과 능력치만 바꾸면 돼요.</p>
+            <p className="note-sub">팬 로스터 초안으로 시작하면 25명이 이미 채워져 있어요. AI가 매긴 등급이라 틀린 곳이 있을 수 있으니, 아는 대로 이름과 능력치를 고쳐 주세요.</p>
             <div className="btn-row">
-              <button className="game-btn" onClick={() => save(sampleRepository.getRoster(teamId).map(fromPlayer))}>
-                가상 선수로 시작
+              <button className="game-btn" onClick={() => save(fanRoster(teamId))}>
+                팬 로스터 초안으로 시작
               </button>
               <button className="game-btn secondary" onClick={() => save([])}>
                 빈 로스터
@@ -243,7 +243,7 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
 
       <div className="btn-row">
         <button className={`game-btn secondary${confirmReset ? ' danger' : ''}`} onClick={() => (confirmReset ? onChange(null) : setConfirmReset(true))}>
-          {confirmReset ? '한 번 더 누르면 가상 선수로 되돌려요' : '가상 선수로 되돌리기'}
+          {confirmReset ? '한 번 더 누르면 팬 로스터 초안으로 되돌려요' : '팬 로스터 초안으로 되돌리기'}
         </button>
       </div>
 
