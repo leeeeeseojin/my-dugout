@@ -186,7 +186,7 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
                   <button className="game-btn secondary" onClick={() => setAiStep('idle')}>
                     그만두기
                   </button>
-                  <button className="game-btn" onClick={() => save(fanRoster(teamId))}>
+                  <button className="game-btn danger" onClick={() => save(fanRoster(teamId))}>
                     불러오기
                   </button>
                 </div>
