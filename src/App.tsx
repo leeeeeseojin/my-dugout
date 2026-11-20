@@ -118,7 +118,7 @@ function App() {
             game={screen.game}
             decisions={screen.decisions}
             teams={teams}
-            onAgain={() => goLineup(screen.my, screen.opp, screen.myHome)}
+            onAgain={() => goLineup(screen.my, screen.opp, Math.random() < 0.5)}
             onRecords={() => setScreen({ name: 'records' })}
             onHome={() => setScreen({ name: 'home' })}
           />
