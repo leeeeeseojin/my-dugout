@@ -673,3 +673,55 @@
   margin: 6px 0 0;
   font-size: 16px;
 }
+
+/* AI 감독 스타일 비교 */
+.style-row {
+  display: contents;
+}
+
+.style-why {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.style-summary {
+  margin: 4px 0 6px;
+  padding: 10px 0;
+  border-top: 2px dashed var(--cream-dark);
+  border-bottom: 2px dashed var(--cream-dark);
+}
+
+.style-closest {
+  margin: 0;
+  font-size: 14px;
+}
+
+.style-closest b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--forest);
+}
+
+.style-closest small {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.style-bars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.style-bars b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--ink);
+}

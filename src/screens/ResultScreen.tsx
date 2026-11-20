@@ -1,9 +1,9 @@
 // 경기 결과와 복기: 판단 순간마다 나 · 코치 · 실제 감독(사례)을 나란히 보여준다
 
-import { CASE_SOURCE_LABEL, sampleCases } from '../data/sampleCases'
 import type { Team } from '../data/types'
 import { winner, type GameState, type SideKey } from '../engine/game'
-import { ACTION_LABEL, findSimilarCases, similarityLabel, situationText, type DecisionRecord } from '../engine/review'
+import { situationText, type DecisionRecord } from '../engine/review'
+import { STYLES, styleMatch } from '../engine/styles'
 import { Scene } from '../ui/Scene'
 import './screens.css'
 
@@ -75,12 +75,13 @@ export function ResultScreen({ game, decisions, teams, onAgain, onRecords, onHom
           {manual.length > 0 && ` · 직접 고른 ${manual.length}번 중 코치와 같은 선택 ${agreed}번`}
           {decisions.length - manual.length > 0 && ` · 코치에게 맡김 ${decisions.length - manual.length}번`}
         </p>
+        <StyleSummary decisions={decisions} />
         {decisions.length === 0 && <p className="review-note">이번 경기에는 작전을 고른 순간이 없었어요. 설정에서 "매 타석"으로 바꾸면 더 자주 물어봐요.</p>}
         {decisions.map((d) => (
           <ReviewItem key={d.id} d={d} />
         ))}
         <p className="review-note">
-          예상 수치는 코치의 시뮬레이션 값이고, 실제 결과는 이번 경기에서 일어난 일이에요. 둘은 다를 수 있어요. 실제 감독 칸은 {CASE_SOURCE_LABEL}이며, 감독의 의도가 아니라 실제로 한 행동만 보여줘요.
+          예상 수치는 코치의 시뮬레이션 값이고, 실제 결과는 이번 경기에서 일어난 일이에요. 둘은 다를 수 있어요. 세 AI 감독은 실제 감독이 아니라, 같은 상황을 서로 다른 철학으로 본 가상의 관점이에요. 정답이 아니라 비교를 위한 거예요.
         </p>
       </div>
 
@@ -99,13 +100,38 @@ export function ResultScreen({ game, decisions, teams, onAgain, onRecords, onHom
   )
 }
 
+function StyleSummary({ decisions }: { decisions: DecisionRecord[] }) {
+  const m = styleMatch(decisions)
+  if (!m.total) return null
+  return (
+    <div className="style-summary">
+      {m.closest ? (
+        <p className="style-closest">
+          나와 가장 닮은 감독: <b>{m.closest.name}</b>
+          <small>{m.closest.motto}</small>
+        </p>
+      ) : (
+        <p className="style-closest">
+          세 AI 감독 누구와도 다른 <b>나만의 스타일</b>
+        </p>
+      )}
+      <div className="style-bars">
+        {m.counts.map((c) => (
+          <span key={c.style.id}>
+            {c.style.name} <b>{c.same}</b>/{m.total}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ReviewItem({ d }: { d: DecisionRecord }) {
-  const mine = d.options.find((o) => o.id === d.userPickId)!
-  const coach = d.options.find((o) => o.id === d.coachPickId)!
+  const option = (id: string) => d.options.find((o) => o.id === id) ?? d.options[0]
+  const mine = option(d.userPickId)
+  const coach = option(d.coachPickId)
   const same = mine.id === coach.id
-  const match = findSimilarCases(d.situation, sampleCases())
   const runsText = d.runsAfter === null ? '' : d.situation.side === 'offense' ? `이 이닝 ${d.runsAfter}점 냄` : `이 이닝 ${d.runsAfter}점 내줌`
-  const total = match ? match.cases.length : 0
   return (
     <div className="review">
       <div className="review-sit">
@@ -117,7 +143,10 @@ function ReviewItem({ d }: { d: DecisionRecord }) {
           {mine.label}
           {d.delegated && <small style={{ color: 'var(--ink-soft)', fontSize: 12 }}> (코치에게 맡김)</small>}
         </span>
-        <span className="val">{runsText}</span>
+        <span className="val">
+          예상 {mine.value}
+          {runsText && ` · 실제로는 ${runsText}`}
+        </span>
 
         <span className="who">코치</span>
         <span>
@@ -127,24 +156,22 @@ function ReviewItem({ d }: { d: DecisionRecord }) {
           예상 {coach.value} · 확신 {d.coachConfidence}
         </span>
 
-        <span className="who">실제</span>
-        {match ? (
-          <span>
-            {match.counts.map((c) => `${ACTION_LABEL[c.action]} ${c.count}`).join(' · ')}
-            <small style={{ display: 'block', color: 'var(--ink-soft)', fontSize: 11 }}>
-              {match.counts.map((c) => `${ACTION_LABEL[c.action]} 뒤 평균 ${c.avgRuns.toFixed(1)}점`).join(' · ')}
-            </small>
-          </span>
-        ) : (
-          <span style={{ color: 'var(--ink-soft)' }}>조건에 맞는 실제 사례 없음</span>
-        )}
-        <span className="val">{match ? `${total}경기 · ${similarityLabel(match.similarity)}` : ''}</span>
+        {(d.styles ?? []).map((p) => {
+          const style = STYLES.find((s) => s.id === p.id)!
+          const o = option(p.optionId)
+          return (
+            <span key={p.id} className="style-row">
+              <span className="who">{style.name.replace('형', '')}</span>
+              <span>
+                {o.label} {o.id === mine.id && <small className="agree">나와 같음</small>}
+                <small className="style-why">{p.reason}</small>
+              </span>
+              <span className="val">예상 {o.value}</span>
+            </span>
+          )
+        })}
       </div>
-      {!same && !d.delegated && (
-        <p className="review-note">
-          내 선택 예상 {mine.value} · 코치 선택 예상 {coach.value} ({d.metricLabel})
-        </p>
-      )}
+      <p className="review-note">{d.metricLabel} 기준 예상치예요.</p>
     </div>
   )
 }
