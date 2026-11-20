@@ -322,6 +322,19 @@ export function withRo(name: string) {
   return name + (jong === 0 || jong === 8 ? "로" : "으로")
 }
 
+// ───────── 근거 문구 ─────────
+
+const CUSTOM_LIMIT = '직접 매긴 대략적 능력치라 실제 기록과 다를 수 있어요'
+
+/** 근거의 출처: 능력치로 만든 선수는 표본 수 대신 "직접 매긴 능력치"라고 밝힌다 */
+function basis(p: Player, sample: string) {
+  return p.custom ? '직접 매긴 능력치' : sample
+}
+
+function careerWord(p: Player) {
+  return p.custom ? '예상' : '통산'
+}
+
 // ───────── 공격 ─────────
 
 export function pinchCandidates(s: GameState, players: PlayerIndex) {
@@ -447,19 +460,20 @@ export function adviseOffense(s: GameState, players: PlayerIndex, extraPinch?: s
   )
 
   if (best.kind === 'swing') {
-    reasons.push(`${batter.name}의 ${handLabel} 상대 타율 ${fmtAvg(splitAvg(split))} (${split.pa}타석)`)
+    reasons.push(`${batter.name}의 ${handLabel} 상대 타율 ${fmtAvg(splitAvg(split))} (${basis(batter, `${split.pa}타석`)})`)
     if (s.bases.some(Boolean)) reasons.push('아웃을 내주는 작전보다 그대로 치는 쪽이 기대 득점이 높아요')
   }
   if (best.kind === 'bunt') {
-    reasons.push(`${batter.name}의 통산 타율 ${fmtAvg(battingTotals(batter).avg)}로 낮은 편이에요`)
+    reasons.push(`${batter.name}의 ${careerWord(batter)} 타율 ${fmtAvg(battingTotals(batter).avg)}로 낮은 편이에요`)
     reasons.push('경기 후반 접전이라 큰 점수보다 1점을 낼 확률이 중요해요')
   }
   if (best.kind === 'steal') {
     const r = stealCandidate(s)!
     const rp = hitterProfile(players[r.id], 'R')
-    reasons.push(`${players[r.id].name}의 통산 도루 성공률 ${Math.round(rp.stealRate * 100)}% (${rp.stealAttempts}번 시도)`)
+    const runner = players[r.id]
+    reasons.push(`${runner.name}의 ${careerWord(runner)} 도루 성공률 ${Math.round(rp.stealRate * 100)}% (${basis(runner, `${rp.stealAttempts}번 시도`)})`)
     limits.push('상대 포수의 송구 능력은 아직 반영하지 않아요')
-    if (rp.stealAttempts < 15) limits.push(`도루 시도가 ${rp.stealAttempts}번뿐이라 성공률이 불확실해요`)
+    if (rp.stealAttempts < 15 && !runner.custom) limits.push(`도루 시도가 ${rp.stealAttempts}번뿐이라 성공률이 불확실해요`)
   }
   if (best.kind === 'pinch' && best.playerId) {
     const ph = players[best.playerId]
@@ -475,6 +489,7 @@ export function adviseOffense(s: GameState, players: PlayerIndex, extraPinch?: s
   }
   if (bp.splitPa < 80 && best.kind !== 'pinch') limits.push(`${batter.name}의 ${handLabel} 상대 표본이 ${bp.splitPa}타석으로 적어요`)
   if (s.weather.kind === 'rain' || s.weather.kind === 'heavyRain') reasons.push('비 때문에 수비 실책과 도루 실패가 늘어난 상태예요')
+  if (batter.custom || pitcher.custom) limits.push(CUSTOM_LIMIT)
   limits.push('최근 컨디션과 부상은 반영하지 않아요')
 
   const smallSample = limits.some((l) => l.includes('표본') || l.includes('불확실'))
@@ -525,7 +540,7 @@ export function adviseDefense(s: GameState, players: PlayerIndex, extraPitcher?:
   if (best.kind === 'ibb') {
     const team = offense(s)
     const next = players[team.lineup[(team.battingIndex + 1) % 9]]
-    reasons.push(`다음 타자 ${next.name}의 통산 장타율이 ${fmtAvg(battingTotals(next).slg)}로 더 낮아요`)
+    reasons.push(`다음 타자 ${next.name}의 ${careerWord(next)} 장타율이 ${fmtAvg(battingTotals(next).slg)}로 더 낮아요`)
     reasons.push('1루를 채우면 병살로 이닝을 끝낼 수 있어요')
   }
   if (best.kind === 'infieldIn') {
@@ -539,6 +554,7 @@ export function adviseDefense(s: GameState, players: PlayerIndex, extraPitcher?:
     if (best.kind === 'change') limits.unshift(line)
     else reasons.push(line)
   }
+  if (batter.custom || current.custom) limits.push(CUSTOM_LIMIT)
   limits.push('불펜 투수의 연투 피로는 반영하지 않아요')
 
   const smallSample = limits.some((l) => l.includes('표본'))
