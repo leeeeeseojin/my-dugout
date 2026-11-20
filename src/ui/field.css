@@ -34,7 +34,7 @@
   font-family: var(--font-display);
   font-size: 11px;
   fill: #fffaf0;
-  stroke: rgba(24, 40, 24, 0.75);
+  stroke: #294c29;
   stroke-width: 3px;
   paint-order: stroke;
   stroke-linejoin: round;
@@ -85,7 +85,7 @@
   font-family: var(--font-display);
   font-size: 34px;
   color: #fffaf0;
-  -webkit-text-stroke: 7px rgba(30, 50, 30, 0.8);
+  -webkit-text-stroke: 7px #2a4d2a;
   paint-order: stroke fill;
   white-space: nowrap;
   pointer-events: none;
