@@ -41,7 +41,7 @@ export function PlayerCard({ player, team, game, onClose }: Props) {
             <h2>{player.name}</h2>
             <span className="pc-sub">
               {team.short} · {isPitcher ? ROLE_LABEL[player.role ?? 'RP'] + ' ' : ''}
-              {POS_LABEL[player.position]} · {HAND[player.throws]}투{HAND[player.bats]}타 · {debut}년 데뷔
+              {POS_LABEL[player.position]} · {HAND[player.throws]}투{HAND[player.bats]}타 · {player.custom ? '직접 만든 선수' : `${debut}년 데뷔`}
             </span>
           </div>
           <button className="pc-close" onClick={onClose} aria-label="닫기">
@@ -68,40 +68,44 @@ function HitterBody({ player, todayLine }: { player: Player; todayLine?: GameSta
         </p>
       )}
       <div className="pc-stats">
-        <Stat label="통산 타율" value={fmtAvg(t.avg)} />
+        <Stat label={player.custom ? '예상 타율' : '통산 타율'} value={fmtAvg(t.avg)} />
         <Stat label="홈런" value={t.hr} />
         <Stat label="출루율" value={fmtAvg(t.obp)} />
         <Stat label="장타율" value={fmtAvg(t.slg)} />
         <Stat label="도루" value={t.sb} />
       </div>
       <div className="pc-split">
-        <span>좌투수 상대 <b>{fmtAvg(splitAvg(vsL))}</b> <small>{vsL.pa}타석</small></span>
-        <span>우투수 상대 <b>{fmtAvg(splitAvg(vsR))}</b> <small>{vsR.pa}타석</small></span>
+        <span>좌투수 상대 <b>{fmtAvg(splitAvg(vsL))}</b> {!player.custom && <small>{vsL.pa}타석</small>}</span>
+        <span>우투수 상대 <b>{fmtAvg(splitAvg(vsR))}</b> {!player.custom && <small>{vsR.pa}타석</small>}</span>
       </div>
-      <table className="pc-table">
-        <thead>
-          <tr>
-            <th>시즌</th>
-            <th>타석</th>
-            <th>타율</th>
-            <th>홈런</th>
-            <th>볼넷</th>
-            <th>삼진</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recent.map((s) => (
-            <tr key={s.year}>
-              <td>{s.year}</td>
-              <td>{s.pa}</td>
-              <td>{fmtAvg(seasonAvg(s))}</td>
-              <td>{s.hr}</td>
-              <td>{s.bb}</td>
-              <td>{s.so}</td>
+      {player.custom ? (
+        <p className="pc-note">직접 매긴 대략적 능력치로 계산한 예상 성적이에요. 실제 기록이 아니에요.</p>
+      ) : (
+        <table className="pc-table">
+          <thead>
+            <tr>
+              <th>시즌</th>
+              <th>타석</th>
+              <th>타율</th>
+              <th>홈런</th>
+              <th>볼넷</th>
+              <th>삼진</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {recent.map((s) => (
+              <tr key={s.year}>
+                <td>{s.year}</td>
+                <td>{s.pa}</td>
+                <td>{fmtAvg(seasonAvg(s))}</td>
+                <td>{s.hr}</td>
+                <td>{s.bb}</td>
+                <td>{s.so}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {player.batting.length > 5 && <p className="pc-note">최근 5시즌만 표시 · 통산은 {player.batting.length}시즌 합계</p>}
     </div>
   )
@@ -128,40 +132,44 @@ function PitcherBody({ player, todayLine }: { player: Player; todayLine?: GameSt
         </>
       )}
       <div className="pc-stats">
-        <Stat label="통산 ERA" value={t.era.toFixed(2)} />
+        <Stat label={player.custom ? '예상 ERA' : '통산 ERA'} value={t.era.toFixed(2)} />
         <Stat label="승패" value={`${t.w}-${t.l}`} />
         <Stat label="세이브" value={t.sv} />
         <Stat label="WHIP" value={t.whip.toFixed(2)} />
         <Stat label="탈삼진" value={t.so} />
       </div>
       <div className="pc-split">
-        <span>좌타자 피안타율 <b>{fmtAvg(splitAvg(vsL))}</b> <small>{vsL.pa}타자</small></span>
-        <span>우타자 피안타율 <b>{fmtAvg(splitAvg(vsR))}</b> <small>{vsR.pa}타자</small></span>
+        <span>좌타자 피안타율 <b>{fmtAvg(splitAvg(vsL))}</b> {!player.custom && <small>{vsL.pa}타자</small>}</span>
+        <span>우타자 피안타율 <b>{fmtAvg(splitAvg(vsR))}</b> {!player.custom && <small>{vsR.pa}타자</small>}</span>
       </div>
-      <table className="pc-table">
-        <thead>
-          <tr>
-            <th>시즌</th>
-            <th>경기</th>
-            <th>이닝</th>
-            <th>ERA</th>
-            <th>삼진</th>
-            <th>볼넷</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recent.map((s) => (
-            <tr key={s.year}>
-              <td>{s.year}</td>
-              <td>{s.g}</td>
-              <td>{Math.round(s.ip)}</td>
-              <td>{s.ip ? ((s.er * 9) / s.ip).toFixed(2) : '-'}</td>
-              <td>{s.so}</td>
-              <td>{s.bb}</td>
+      {player.custom ? (
+        <p className="pc-note">직접 매긴 대략적 능력치로 계산한 예상 성적이에요. 실제 기록이 아니에요.</p>
+      ) : (
+        <table className="pc-table">
+          <thead>
+            <tr>
+              <th>시즌</th>
+              <th>경기</th>
+              <th>이닝</th>
+              <th>ERA</th>
+              <th>삼진</th>
+              <th>볼넷</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {recent.map((s) => (
+              <tr key={s.year}>
+                <td>{s.year}</td>
+                <td>{s.g}</td>
+                <td>{Math.round(s.ip)}</td>
+                <td>{s.ip ? ((s.er * 9) / s.ip).toFixed(2) : '-'}</td>
+                <td>{s.so}</td>
+                <td>{s.bb}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {player.pitching.length > 5 && <p className="pc-note">최근 5시즌만 표시 · 통산은 {player.pitching.length}시즌 합계</p>}
     </div>
   )
