@@ -4,6 +4,7 @@ import type { Player, Team } from '../data/types'
 import { staminaOf, type GameState } from '../engine/game'
 import { battingTotals, fmtAvg, pitchingTotals, seasonAvg, splitAvg } from '../engine/stats'
 import { Character } from './Character'
+import { Sheet } from './Sheet'
 import './playerCard.css'
 
 const POS_LABEL: Record<string, string> = {
@@ -30,8 +31,7 @@ export function PlayerCard({ player, team, game, onClose }: Props) {
   const todayP = game?.pitching[player.id]
 
   return (
-    <div className="sheet-backdrop" onClick={onClose}>
-      <div className="player-card" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={`${player.name} 선수 카드`}>
+    <Sheet className="player-card" label={`${player.name} 선수 카드`} onClose={onClose}>
         <div className="pc-head" style={{ background: team.color }}>
           <svg className="pc-avatar" viewBox="-24 -52 48 60" width={72} height={90} aria-hidden>
             <Character jersey={team.color} cap={team.accent === '#ffffff' ? team.color : team.accent} skin={player.look.skin} hair={player.look.hair} facing="down" pose={isPitcher ? 'pitch' : 'stand'} />
@@ -50,8 +50,7 @@ export function PlayerCard({ player, team, game, onClose }: Props) {
         </div>
 
         {isPitcher ? <PitcherBody player={player} todayLine={todayP} /> : <HitterBody player={player} todayLine={today} />}
-      </div>
-    </div>
+    </Sheet>
   )
 }
 

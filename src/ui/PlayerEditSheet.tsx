@@ -16,6 +16,7 @@ import {
 } from '../data/ratings'
 import type { Hand, PitcherRole, Position } from '../data/types'
 import { battingTotals, fmtAvg, pitchingTotals } from '../engine/stats'
+import { Sheet } from './Sheet'
 import './playerCard.css'
 import './rosterEdit.css'
 
@@ -83,8 +84,7 @@ export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onCl
   }, [p, teamId, isPitcher])
 
   return (
-    <div className="sheet-backdrop" onClick={onClose}>
-      <div className="player-card edit-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="선수 편집">
+    <Sheet className="player-card edit-sheet" label="선수 편집" onClose={onClose}>
         <div className="settings-head">
           <h2>{isNew ? (isPitcher ? '투수 추가' : '타자 추가') : '선수 편집'}</h2>
           <button className="round-btn" onClick={onClose} aria-label="닫기">
@@ -170,7 +170,6 @@ export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onCl
             저장
           </button>
         </div>
-      </div>
-    </div>
+    </Sheet>
   )
 }
