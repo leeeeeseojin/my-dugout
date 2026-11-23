@@ -2,7 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 
 // 시트(설정·선수 카드·선수 편집)는 화면 위에 뜨는 모달이다.
 // 사람에게도, 화면을 접근성 트리로 읽는 AI 에이전트에게도 "지금은 이 창만 조작할 수 있다"가 드러나야 한다.
-// 접근성 트리는 Playwright MCP가 에이전트에게 보여주는 것과 같은 ariaSnapshot으로 확인한다.
+// 접근성 트리는 Playwright의 표준 ariaSnapshot으로 확인한다.
+// Playwright MCP가 에이전트에게 주는 AI용 스냅샷은 aria-hidden·inert를 따르지 않아 뒤쪽 버튼이 남는다. 여기서는 검사하지 않는다.
 
 async function openSettings(page: Page) {
   await page.goto('/')

@@ -1,7 +1,8 @@
 // 화면 위에 뜨는 시트(모달)의 공통 동작.
 // 사람에게도, 화면을 접근성 트리로 읽는 AI 에이전트에게도 "지금은 이 창만 조작할 수 있다"가 드러나야 한다.
-// - 뒤쪽 화면(#root)은 inert + aria-hidden: 보이지도, 눌리지도, 포커스되지도 않는다
-//   (Playwright MCP 같은 도구는 inert만으로는 뒤쪽 버튼을 계속 보여준다)
+// - 뒤쪽 화면(#root)은 inert + aria-hidden: 접근성 트리에서 빠지고, 눌리지도 포커스되지도 않는다
+//   (Playwright의 접근성 트리는 inert만으로는 뒤쪽 버튼을 빼지 않아 aria-hidden도 건다)
+// - 한계: Playwright MCP가 에이전트에게 주는 AI용 스냅샷은 둘 다 따르지 않고, 화면에 보이는 뒤쪽 버튼을 이름 없이 계속 보여준다
 // - Esc로 닫히고, 닫히면 시트를 연 버튼으로 포커스가 돌아간다
 
 import { useEffect, useRef, type ReactNode } from 'react'
