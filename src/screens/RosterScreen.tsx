@@ -109,10 +109,10 @@ export function RosterScreen({ rosters, onChange, onBack }: Props) {
         <p className="note-sub">다른 기기로 옮기거나 친구와 주고받을 때 써요. 실명 로스터 파일을 공개된 곳에 올리지는 말아 주세요.</p>
         <div className="btn-row" style={{ marginTop: 6 }}>
           <button className="game-btn secondary" onClick={download}>
-            파일로 저장
+            로스터 파일로 저장
           </button>
           <button className="game-btn secondary" onClick={() => fileInput.current?.click()}>
-            파일 불러오기
+            로스터 파일 불러오기
           </button>
         </div>
         <input

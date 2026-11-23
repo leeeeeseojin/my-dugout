@@ -44,7 +44,7 @@ export function PlayerCard({ player, team, game, onClose }: Props) {
               {POS_LABEL[player.position]} · {HAND[player.throws]}투{HAND[player.bats]}타 · {player.custom ? (player.ratedBy === 'ai' ? '팬 로스터 초안' : '직접 만든 선수') : `${debut}년 데뷔`}
             </span>
           </div>
-          <button className="pc-close" onClick={onClose} aria-label="닫기">
+          <button className="pc-close" onClick={onClose} aria-label="선수 카드 닫기">
             ✕
           </button>
         </div>

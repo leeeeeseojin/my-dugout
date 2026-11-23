@@ -87,7 +87,7 @@ export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onCl
     <Sheet className="player-card edit-sheet" label="선수 편집" onClose={onClose}>
         <div className="settings-head">
           <h2>{isNew ? (isPitcher ? '투수 추가' : '타자 추가') : '선수 편집'}</h2>
-          <button className="round-btn" onClick={onClose} aria-label="닫기">
+          <button className="round-btn" onClick={onClose} aria-label="선수 편집 닫기">
             ✕
           </button>
         </div>
@@ -163,11 +163,12 @@ export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onCl
         <div className="btn-row">
           {!isNew && (
             <button className={`game-btn secondary${confirmDelete ? ' danger' : ''}`} onClick={() => (confirmDelete ? onDelete() : setConfirmDelete(true))}>
-              {confirmDelete ? '한 번 더 누르면 삭제' : '삭제'}
+              {confirmDelete ? '한 번 더 누르면 선수 삭제' : '선수 삭제'}
             </button>
           )}
+          {/* 버튼 이름은 화면 전체에서 겹치지 않게: 이름만 보고 누르는 쪽(AI 에이전트)이 다른 "저장"과 헷갈리지 않도록 */}
           <button className="game-btn" onClick={() => onSave({ ...p, name: p.name.trim(), ratedBy: undefined })}>
-            저장
+            선수 저장
           </button>
         </div>
     </Sheet>

@@ -29,7 +29,7 @@ export function SettingsSheet({ settings, onChange, onClose }: Props) {
     <Sheet className="player-card settings" label="경기 운영 설정" onClose={onClose}>
         <div className="settings-head">
           <h2>운영 방식</h2>
-          <button className="round-btn" onClick={onClose} aria-label="닫기">
+          <button className="round-btn" onClick={onClose} aria-label="설정 닫기">
             ✕
           </button>
         </div>
