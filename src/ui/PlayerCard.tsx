@@ -18,13 +18,15 @@ interface Props {
   team: Team
   game?: GameState
   onClose: () => void
+  /** 시트가 열리면 뒤 화면이 사라지므로, 거기서 보던 지금 상황(경기 점수, 라인업 자리 등)을 한 줄로 */
+  context?: string
 }
 
 function sumSplits<T extends { pa?: number; bf?: number; h: number; bb: number; hr: number; so: number }>(rows: T[]) {
   return rows.reduce((a, s) => ({ pa: a.pa + (s.pa ?? s.bf ?? 0), h: a.h + s.h, bb: a.bb + s.bb, hr: a.hr + s.hr, so: a.so + s.so }), { pa: 0, h: 0, bb: 0, hr: 0, so: 0 })
 }
 
-export function PlayerCard({ player, team, game, onClose }: Props) {
+export function PlayerCard({ player, team, game, onClose, context }: Props) {
   const isPitcher = player.position === 'P'
   const debut = (isPitcher ? player.pitching : player.batting)[0]?.year
   const today = game?.batting[player.id]
@@ -49,6 +51,7 @@ export function PlayerCard({ player, team, game, onClose }: Props) {
           </button>
         </div>
 
+        {context && <p className="sheet-context">{context}</p>}
         {isPitcher ? <PitcherBody player={player} todayLine={todayP} /> : <HitterBody player={player} todayLine={today} />}
     </Sheet>
   )

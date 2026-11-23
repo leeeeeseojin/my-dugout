@@ -45,6 +45,8 @@ interface Props {
   onSave: (p: CustomPlayer) => void
   onDelete: () => void
   onClose: () => void
+  /** 시트가 열리면 뒤 화면이 사라지므로, 로스터 현황을 한 줄로 */
+  context?: string
 }
 
 function Steps<T extends string | number>({ value, options, onChange }: { value: T; options: { value: T; label: string }[]; onChange: (v: T) => void }) {
@@ -62,7 +64,7 @@ function Steps<T extends string | number>({ value, options, onChange }: { value:
 const levels = (steps: readonly string[]) => steps.map((label, i) => ({ value: i as Level, label }))
 const platoons = [-1, 0, 1].map((v) => ({ value: v as Platoon, label: PLATOON_LABEL[v as Platoon] }))
 
-export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onClose }: Props) {
+export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onClose, context }: Props) {
   const [p, setP] = useState(initial)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const isPitcher = p.position === 'P'
@@ -91,6 +93,7 @@ export function PlayerEditSheet({ teamId, initial, isNew, onSave, onDelete, onCl
             ✕
           </button>
         </div>
+        {context && <p className="sheet-context">{context}</p>}
 
         <div className="edit-row two">
           <label>

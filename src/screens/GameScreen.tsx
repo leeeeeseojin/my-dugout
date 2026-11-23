@@ -250,10 +250,13 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
 
   // 시트가 열린 동안에는 경기장·버튼을 그리지 않는다. 경기 상태는 이 컴포넌트에 남아 있고 진행도 멈춰 있다
   if ((cardPlayer && cardTeam) || showSettings) {
+    // 점수판이 안 보이니 지금 상황을 시트 안에 한 줄로 알려 준다
+    const waiting = (phase === 'decide' || phase === 'delegate') && advice ? ` · ${advice.side === 'offense' ? '공격' : '수비'} 작전 고르는 중` : ''
+    const status = `${halfLabel(game)} · ${teams.away.short} ${game.score.away} : ${game.score.home} ${teams.home.short} · ${game.outs}아웃 ${baseState(game.bases)}${waiting}`
     return (
       <div className="game-screen">
-        {cardPlayer && cardTeam && <PlayerCard player={cardPlayer} team={cardTeam} game={game} onClose={() => setCardId(null)} />}
-        {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
+        {cardPlayer && cardTeam && <PlayerCard player={cardPlayer} team={cardTeam} game={game} context={status} onClose={() => setCardId(null)} />}
+        {showSettings && <SettingsSheet settings={settings} onChange={onSettings} context={status} onClose={() => setShowSettings(false)} />}
       </div>
     )
   }

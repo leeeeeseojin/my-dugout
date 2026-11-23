@@ -233,6 +233,7 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
           teamId={teamId}
           initial={editing.player}
           isNew={editing.isNew}
+          context={`${team.short} 로스터 · 타자 ${hitters.length} · 투수 ${pitchers.length} · ${check.ok ? '경기에 쓸 수 있어요' : '아직 경기에 못 써요'}`}
           onClose={() => setEditing(null)}
           onDelete={() => {
             save(roster.players.filter((p) => p.id !== editing.player.id))

@@ -8,6 +8,8 @@ interface Props {
   settings: PlaySettings
   onChange: (s: PlaySettings) => void
   onClose: () => void
+  /** 시트가 열리면 뒤 화면이 사라지므로, 거기서 보던 지금 상황(경기 점수 등)을 한 줄로 */
+  context?: string
 }
 
 // 고른 값이 색으로만 보이면 화면을 읽는 쪽(스크린 리더, AI 에이전트)은 무엇이 골라졌는지 모른다.
@@ -23,7 +25,7 @@ function Segment<T extends string | boolean>({ label, value, options, onChange }
   )
 }
 
-export function SettingsSheet({ settings, onChange, onClose }: Props) {
+export function SettingsSheet({ settings, onChange, onClose, context }: Props) {
   const set = (patch: Partial<PlaySettings>) => onChange({ ...settings, ...patch })
   return (
     <Sheet className="player-card settings" label="경기 운영 설정" onClose={onClose}>
@@ -33,6 +35,7 @@ export function SettingsSheet({ settings, onChange, onClose }: Props) {
             ✕
           </button>
         </div>
+        {context && <p className="sheet-context">{context}</p>}
         <div className="settings-row">
           <div>
             <b>공격 작전</b>

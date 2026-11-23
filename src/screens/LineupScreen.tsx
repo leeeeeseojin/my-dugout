@@ -67,12 +67,21 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
 
   const hint = sel?.kind === 'order' ? '바꿀 타순이나 후보 선수를 누르세요' : sel?.kind === 'bench' ? '들어갈 타순을 누르세요' : '선수를 누르면 자리를 바꿀 수 있어요'
 
+  // 선수 카드가 열리면 타순표가 안 보이니, 그 선수의 오늘 자리를 카드 안에 적어 준다
+  const slotText = (id: string) => {
+    const i = plan.order.indexOf(id)
+    if (i >= 0) return `오늘 라인업: ${i + 1}번 타자 · ${POS_LABEL[plan.fielding[id]]}`
+    if (plan.bench.includes(id)) return '오늘 라인업: 후보'
+    if (plan.starterId === id) return '오늘 라인업: 선발 투수'
+    return byId[id].role === 'SP' ? '오늘 라인업: 선발 후보' : '오늘 라인업: 불펜'
+  }
+
   // 시트가 열린 동안에는 뒤쪽 버튼을 그리지 않고 배경 그림만 남긴다
   if (cardId || showSettings) {
     return (
       <div className="screen has-floating">
         <Scene />
-        {cardId && <PlayerCard player={byId[cardId]} team={team} onClose={() => setCardId(null)} />}
+        {cardId && <PlayerCard player={byId[cardId]} team={team} context={slotText(cardId)} onClose={() => setCardId(null)} />}
         {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
       </div>
     )
