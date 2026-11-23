@@ -19,8 +19,9 @@ interface Props {
   mode: 'decide' | 'delegate'
   delegateMs: number
   candidates: Candidate[]
-  /** 사용자가 직접 추가로 고른 대타·투수 id */
-  extraId?: string
+  /** 지금 골라 둔 작전. 시트를 여닫느라 패널이 다시 그려져도 남도록 바깥에서 들고 있다. 없으면 기본값 */
+  picked: string | null
+  onPick: (optionId: string) => void
   onPickCandidate: (id: string) => void
   onDecide: (optionId: string) => void
   onIntervene: () => void
@@ -29,19 +30,11 @@ interface Props {
 const CONF_COLOR = { 높음: '#7ed38a', 중간: '#f2c35b', 낮음: '#ff9f8f' }
 
 export function DecisionPanel(props: Props) {
-  const { title, advice, showCoach, mode, delegateMs, candidates, extraId, onPickCandidate, onDecide, onIntervene } = props
-  const defaultPick = showCoach ? advice.recommendedId : advice.options[0].id
-  const [picked, setPicked] = useState(defaultPick)
+  const { title, advice, showCoach, mode, delegateMs, candidates, onPick, onPickCandidate, onDecide, onIntervene } = props
+  const picked = props.picked ?? (showCoach ? advice.recommendedId : advice.options[0].id)
   const [why, setWhy] = useState(false)
   const [choosing, setChoosing] = useState(false)
   const recommended = advice.options.find((o) => o.id === advice.recommendedId)!
-
-  // 새로 추가한 대타·투수는 바로 선택 상태로
-  useEffect(() => {
-    if (!extraId) return
-    const opt = advice.options.find((o) => o.playerId === extraId)
-    if (opt) setPicked(opt.id)
-  }, [extraId, advice])
 
   useEffect(() => {
     if (mode !== 'delegate') return
@@ -101,7 +94,7 @@ export function DecisionPanel(props: Props) {
       <div className="dp-metric">{advice.metricLabel}</div>
       <div role="radiogroup" aria-label="작전 선택">
         {advice.options.map((o) => (
-          <button key={o.id} role="radio" aria-checked={picked === o.id} className={`dp-opt${picked === o.id ? ' on' : ''}`} onClick={() => setPicked(o.id)}>
+          <button key={o.id} role="radio" aria-checked={picked === o.id} className={`dp-opt${picked === o.id ? ' on' : ''}`} onClick={() => onPick(o.id)}>
             <span className="dot" />
             <span className="dp-label">
               {o.label}

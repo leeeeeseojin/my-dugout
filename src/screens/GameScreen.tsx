@@ -69,7 +69,8 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
   const [paused, setPaused] = useState(false)
   const [speed, setSpeed] = useState(1)
   const [advice, setAdvice] = useState<CoachAdvice | null>(null)
-  const [extraId, setExtraId] = useState<string | undefined>()
+  /** 작전 패널에서 골라 둔 작전. 시트를 열었다 닫아도 그대로 남는다 */
+  const [pickedId, setPickedId] = useState<string | null>(null)
   const [decisions, setDecisions] = useState<DecisionRecord[]>([])
   const [cardId, setCardId] = useState<string | null>(null)
   const [showSettings, setShowSettings] = useState(false)
@@ -100,7 +101,7 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
       setGame(next)
       setPhase(next.over ? 'over' : 'auto')
       setAdvice(null)
-      setExtraId(undefined)
+      setPickedId(null)
       setIntervened(false)
     },
     [settle],
@@ -210,8 +211,11 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
 
   const pickCandidate = useCallback(
     (id: string) => {
-      setExtraId(id)
-      setAdvice(adviseFor(game, players, advice?.side === 'offense' ? { pinch: id } : { pitcher: id }))
+      const next = adviseFor(game, players, advice?.side === 'offense' ? { pinch: id } : { pitcher: id })
+      setAdvice(next)
+      // 새로 추가한 대타·투수는 바로 선택 상태로
+      const opt = next.options.find((o) => o.playerId === id)
+      if (opt) setPickedId(opt.id)
     },
     [game, players, advice],
   )
@@ -292,7 +296,8 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
             mode={phase}
             delegateMs={settings.delegateDelay}
             candidates={candidates}
-            extraId={extraId}
+            picked={pickedId}
+            onPick={setPickedId}
             onPickCandidate={pickCandidate}
             onDecide={decide}
             onIntervene={() => {
