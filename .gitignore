@@ -26,3 +26,7 @@ dist-ssr
 # 로스터 편집기에서 내보낸 실명 로스터 파일은 저장소에 올리지 않는다
 my-dugout-rosters*.json
 *.roster.json
+
+# Playwright 결과
+test-results/
+playwright-report/
