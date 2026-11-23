@@ -67,6 +67,17 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
 
   const hint = sel?.kind === 'order' ? '바꿀 타순이나 후보 선수를 누르세요' : sel?.kind === 'bench' ? '들어갈 타순을 누르세요' : '선수를 누르면 자리를 바꿀 수 있어요'
 
+  // 시트가 열린 동안에는 뒤쪽 버튼을 그리지 않고 배경 그림만 남긴다
+  if (cardId || showSettings) {
+    return (
+      <div className="screen has-floating">
+        <Scene />
+        {cardId && <PlayerCard player={byId[cardId]} team={team} onClose={() => setCardId(null)} />}
+        {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
+      </div>
+    )
+  }
+
   return (
     <div className="screen has-floating">
       <Scene />
@@ -95,7 +106,7 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
                   {fmtAvg(t.avg)} · {t.hr}홈런
                 </span>
               </button>
-              <button className="info-btn" onClick={() => setCardId(id)} aria-label={`${p.name} 선수 카드`}>
+              <button className="info-btn" onClick={() => setCardId(id)} aria-label={`${p.name} 선수 카드`} data-opener={`card-${id}`}>
                 i
               </button>
             </div>
@@ -119,7 +130,7 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
                   {fmtAvg(t.avg)} · {p.bats === 'L' ? '좌타' : p.bats === 'S' ? '양타' : '우타'}
                 </span>
               </button>
-              <button className="info-btn" onClick={() => setCardId(id)} aria-label={`${p.name} 선수 카드`}>
+              <button className="info-btn" onClick={() => setCardId(id)} aria-label={`${p.name} 선수 카드`} data-opener={`card-${id}`}>
                 i
               </button>
             </div>
@@ -133,7 +144,7 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
           {starters.map((p) => {
             const t = pitchingTotals(p)
             return (
-              <button key={p.id} className={`chip${plan.starterId === p.id ? ' on' : ''}`} onClick={() => setPlan({ ...plan, starterId: p.id })} onDoubleClick={() => setCardId(p.id)}>
+              <button key={p.id} className={`chip${plan.starterId === p.id ? ' on' : ''}`} onClick={() => setPlan({ ...plan, starterId: p.id })} onDoubleClick={() => setCardId(p.id)} data-opener={`starter-${p.id}`}>
                 {p.name}
                 <small>
                   {p.throws === 'L' ? '좌완' : '우완'} · ERA {t.era.toFixed(2)}
@@ -156,7 +167,7 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
             코치 추천 <b>{settings.showCoach ? '보기' : '숨기기'}</b> · 물어보는 때 <b>{settings.ask === 'key' ? '중요할 때' : '매 타석'}</b>
           </p>
         </div>
-        <button className="game-btn secondary small-btn" onClick={() => setShowSettings(true)}>
+        <button className="game-btn secondary small-btn" onClick={() => setShowSettings(true)} data-opener="settings">
           바꾸기
         </button>
       </div>
@@ -166,9 +177,6 @@ export function LineupScreen({ team, roster, initial, settings, onSettings, onBa
           플레이볼!
         </button>
       </div>
-
-      {cardId && <PlayerCard player={byId[cardId]} team={team} onClose={() => setCardId(null)} />}
-      {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
     </div>
   )
 }

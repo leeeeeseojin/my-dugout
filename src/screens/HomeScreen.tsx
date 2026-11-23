@@ -17,10 +17,21 @@ interface Props {
 
 export function HomeScreen({ sourceLabel, settings, onSettings, onStart, onRosters, onRecords }: Props) {
   const [showSettings, setShowSettings] = useState(false)
+
+  // 시트가 열린 동안에는 뒤쪽 버튼을 그리지 않고 배경 그림만 남긴다
+  if (showSettings) {
+    return (
+      <div className="screen home">
+        <Scene />
+        <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />
+      </div>
+    )
+  }
+
   return (
     <div className="screen home">
       <Scene />
-      <button className="round-btn corner-btn" onClick={() => setShowSettings(true)} aria-label="운영 방식 설정">
+      <button className="round-btn corner-btn" onClick={() => setShowSettings(true)} aria-label="운영 방식 설정" data-opener="settings">
         <GearIcon />
       </button>
       <svg viewBox="-60 -60 120 70" width={220} height={128} aria-hidden>
@@ -47,7 +58,6 @@ export function HomeScreen({ sourceLabel, settings, onSettings, onStart, onRoste
         <br />
         비공식 팬 게임 · KBO, 구단, 선수와 관계없어요
       </p>
-      {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
     </div>
   )
 }

@@ -248,6 +248,16 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
     ? `${halfLabel(game)} · ${diffText} · ${game.outs}사 ${baseState(game.bases)} · ${advice.side === 'offense' ? '공격' : '수비'} 작전`
     : ''
 
+  // 시트가 열린 동안에는 경기장·버튼을 그리지 않는다. 경기 상태는 이 컴포넌트에 남아 있고 진행도 멈춰 있다
+  if ((cardPlayer && cardTeam) || showSettings) {
+    return (
+      <div className="game-screen">
+        {cardPlayer && cardTeam && <PlayerCard player={cardPlayer} team={cardTeam} game={game} onClose={() => setCardId(null)} />}
+        {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
+      </div>
+    )
+  }
+
   return (
     <div className={`game-screen${phase === 'decide' || phase === 'delegate' ? ' deciding' : ''}`}>
       <Field game={game} players={players} teams={teams} onSelect={setCardId} selectedId={cardId} />
@@ -280,7 +290,7 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
           <span className="weather" title={WEATHER_EFFECTS[game.weather.kind].label}>
             <WeatherIcon kind={game.weather.kind} />
           </span>
-          <button className="round-btn" onClick={() => setShowSettings(true)} aria-label="운영 방식 설정">
+          <button className="round-btn" onClick={() => setShowSettings(true)} aria-label="운영 방식 설정" data-opener="settings">
             <GearIcon />
           </button>
         </div>
@@ -355,8 +365,6 @@ export function GameScreen({ initial, players, teams, rng, settings, onSettings,
         )}
       </section>
 
-      {cardPlayer && cardTeam && <PlayerCard player={cardPlayer} team={cardTeam} game={game} onClose={() => setCardId(null)} />}
-      {showSettings && <SettingsSheet settings={settings} onChange={onSettings} onClose={() => setShowSettings(false)} />}
       <span className="sr-only">{userTeam.name}</span>
     </div>
   )

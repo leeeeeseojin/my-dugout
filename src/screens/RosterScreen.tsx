@@ -211,7 +211,7 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
     })
 
   const row = (p: CustomPlayer) => (
-    <button key={p.id} className="roster-row" onClick={() => setEditing({ player: p, isNew: false })}>
+    <button key={p.id} className="roster-row" onClick={() => setEditing({ player: p, isNew: false })} data-opener={`player-${p.id}`}>
       <span className="order">{p.number}</span>
       <span className="rr-name">
         {p.name || '이름 없음'}
@@ -223,6 +223,30 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
       <span className="rr-tag">›</span>
     </button>
   )
+
+  // 시트가 열린 동안에는 뒤쪽 버튼을 그리지 않고 배경 그림만 남긴다
+  if (editing) {
+    return (
+      <div className="screen">
+        <Scene />
+        <PlayerEditSheet
+          teamId={teamId}
+          initial={editing.player}
+          isNew={editing.isNew}
+          onClose={() => setEditing(null)}
+          onDelete={() => {
+            save(roster.players.filter((p) => p.id !== editing.player.id))
+            setEditing(null)
+          }}
+          onSave={(p) => {
+            const exists = roster.players.some((x) => x.id === p.id)
+            save(exists ? roster.players.map((x) => (x.id === p.id ? p : x)) : [...roster.players, p])
+            setEditing(null)
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="screen">
@@ -254,7 +278,7 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
       <div className="note">
         <h2>타자 {hitters.length}</h2>
         {hitters.map(row)}
-        <button className="add-btn" onClick={() => add(false)}>
+        <button className="add-btn" onClick={() => add(false)} data-opener="add-hitter">
           + 타자 추가
         </button>
       </div>
@@ -262,7 +286,7 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
       <div className="note">
         <h2>투수 {pitchers.length}</h2>
         {pitchers.map(row)}
-        <button className="add-btn" onClick={() => add(true)}>
+        <button className="add-btn" onClick={() => add(true)} data-opener="add-pitcher">
           + 투수 추가
         </button>
       </div>
@@ -272,24 +296,6 @@ function TeamRoster({ teamId, roster, onChange, onBack }: { teamId: string; rost
           {confirmReset ? '한 번 더 누르면 가상 선수로 되돌려요' : '가상 선수로 되돌리기'}
         </button>
       </div>
-
-      {editing && (
-        <PlayerEditSheet
-          teamId={teamId}
-          initial={editing.player}
-          isNew={editing.isNew}
-          onClose={() => setEditing(null)}
-          onDelete={() => {
-            save(roster.players.filter((p) => p.id !== editing.player.id))
-            setEditing(null)
-          }}
-          onSave={(p) => {
-            const exists = roster.players.some((x) => x.id === p.id)
-            save(exists ? roster.players.map((x) => (x.id === p.id ? p : x)) : [...roster.players, p])
-            setEditing(null)
-          }}
-        />
-      )}
     </div>
   )
 }
